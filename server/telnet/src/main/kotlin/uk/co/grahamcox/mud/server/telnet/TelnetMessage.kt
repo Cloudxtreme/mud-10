@@ -8,7 +8,31 @@ sealed class TelnetMessage {
      * Telnet message representing a single byte that was sent or received
      * @property byte The actual byte
      */
-    class ByteMessage(val byte: Byte) : TelnetMessage()
+    class ByteMessage(val byte: Byte) : TelnetMessage() {
+        /**
+         * Compare to another object for equality
+         * @param other The other object to compare to
+         * @return True if the two are equal. False if not
+         */
+        override fun equals(other: Any?): Boolean{
+            if (this === other) return true
+            if (other?.javaClass != javaClass) return false
+
+            other as ByteMessage
+
+            if (byte != other.byte) return false
+
+            return true
+        }
+
+        /**
+         * Generate a hashcode for the message
+         * @return the hashcode
+         */
+        override fun hashCode(): Int{
+            return byte as Int
+        }
+    }
 
     /**
      * Telnet message representing a Command that was sent or received

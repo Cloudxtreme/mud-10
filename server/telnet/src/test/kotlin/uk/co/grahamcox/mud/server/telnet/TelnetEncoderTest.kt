@@ -11,17 +11,11 @@ import org.junit.runner.RunWith
  */
 @RunWith(JUnitParamsRunner::class)
 class TelnetEncoderTest {
-    /** All possible byte values */
-    private fun allBytes() = 0.rangeTo(255).toList().map { b -> b.toByte() }
-
-    /** All possible byte values except for IAC */
-    private fun nonIacBytes() = allBytes().filter { b -> b != TelnetBytes.IAC }
-
     /**
      * Test encoding byte messages
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeByte(byte: Byte) = testEncode(
         TelnetMessage.ByteMessage(byte),
         listOf(byte)
@@ -107,7 +101,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeDoNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.DO, TelnetBytes.DO)
 
@@ -116,7 +110,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeDontNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.DONT, TelnetBytes.DONT)
 
@@ -125,7 +119,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeWillNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.WILL, TelnetBytes.WILL)
 
@@ -134,7 +128,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeWontNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.WONT, TelnetBytes.WONT)
 
@@ -191,7 +185,7 @@ class TelnetEncoderTest {
      * @param option The Option ID
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeEmptyOptionSubnegotiation(option: Byte) = testEncode(
             TelnetMessage.SubnegotiationMessage(option, listOf()),
             listOf(TelnetBytes.IAC, TelnetBytes.SB, option, TelnetBytes.IAC, TelnetBytes.SE))
@@ -209,7 +203,7 @@ class TelnetEncoderTest {
      * @param payloadByte The byte to use for the payload
      */
     @Test
-    @Parameters(method = "nonIacBytes")
+    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
     fun testEncodeSingleByteOptionSubnegotiation(payloadByte: Byte) = testEncode(
             TelnetMessage.SubnegotiationMessage(15, listOf(payloadByte)),
             listOf(TelnetBytes.IAC, TelnetBytes.SB, 15, payloadByte, TelnetBytes.IAC, TelnetBytes.SE))

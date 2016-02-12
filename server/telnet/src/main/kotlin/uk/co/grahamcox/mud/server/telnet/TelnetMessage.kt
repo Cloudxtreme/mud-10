@@ -30,7 +30,7 @@ sealed class TelnetMessage {
          * @return the hashcode
          */
         override fun hashCode(): Int{
-            return byte as Int
+            return byte.toInt()
         }
 
         /**
@@ -134,5 +134,41 @@ sealed class TelnetMessage {
      * @property option The option to sub-negotiate
      * @property payload The payload of the sub-negotiation
      */
-    class SubnegotiationMessage(val option: Byte, val payload: List<Byte>) : TelnetMessage()
+    class SubnegotiationMessage(val option: Byte, val payload: List<Byte>) : TelnetMessage() {
+        /**
+         * Compare to another object for equality
+         * @param other The other object to compare to
+         * @return True if the two are equal. False if not
+         */
+        override fun equals(other: Any?): Boolean{
+            if (this === other) return true
+            if (other?.javaClass != javaClass) return false
+
+            other as SubnegotiationMessage
+
+            if (option != other.option) return false
+            if (payload != other.payload) return false
+
+            return true
+        }
+
+        /**
+         * Generate a hashcode for the message
+         * @return the hashcode
+         */
+        override fun hashCode(): Int{
+            var result = option.toInt()
+            result += 31 * result + payload.hashCode()
+            return result
+        }
+
+        /**
+         * Generate a String for the message
+         * @return the string
+         */
+        override fun toString(): String{
+            return "SubnegotiationMessage(option=$option, payload=$payload)"
+        }
+
+    }
 }

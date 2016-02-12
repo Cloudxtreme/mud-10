@@ -45,4 +45,14 @@ sealed class TelnetDecoderState {
          */
         override fun injectByte(b: Byte) = InjectionResponse(NoState, TelnetMessage.ByteMessage(b))
     }
+
+    /**
+     * Representation of being in a Negotiation situation
+     */
+    class NegotiationState(val negotiation: TelnetMessage.NegotiationMessage.Negotiation) : TelnetDecoderState() {
+        /**
+         * The byte we are receiving is most likely the Option ID. It might be an IAC escaping the next byte though.
+         */
+        override fun injectByte(b: Byte) = InjectionResponse(NoState, TelnetMessage.NegotiationMessage(negotiation, b))
+    }
 }

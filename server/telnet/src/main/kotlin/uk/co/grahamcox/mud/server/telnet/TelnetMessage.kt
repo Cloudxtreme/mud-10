@@ -32,6 +32,14 @@ sealed class TelnetMessage {
         override fun hashCode(): Int{
             return byte as Int
         }
+
+        /**
+         * Generate a String for the message
+         * @return the string
+         */
+        override fun toString(): String{
+            return "ByteMessage(byte=$byte)"
+        }
     }
 
     /**
@@ -81,6 +89,44 @@ sealed class TelnetMessage {
             /** The WONT Negotiation */
             WONT
         }
+
+
+        /**
+         * Generate a String for the message
+         * @return the string
+         */
+        override fun toString(): String{
+            return "NegotiationMessage(negotiation=$negotiation, option=$option)"
+        }
+
+        /**
+         * Compare to another object for equality
+         * @param other The other object to compare to
+         * @return True if the two are equal. False if not
+         */
+        override fun equals(other: Any?): Boolean{
+            if (this === other) return true
+            if (other?.javaClass != javaClass) return false
+
+            other as NegotiationMessage
+
+            if (negotiation != other.negotiation) return false
+            if (option != other.option) return false
+
+            return true
+        }
+
+        /**
+         * Generate a hashcode for the message
+         * @return the hashcode
+         */
+        override fun hashCode(): Int{
+            var result = negotiation.hashCode()
+            result += 31 * result + option
+            return result
+        }
+
+
     }
 
     /**

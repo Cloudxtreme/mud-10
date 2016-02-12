@@ -68,7 +68,7 @@ object TelnetEncoder {
             TelnetMessage.NegotiationMessage.Negotiation.WONT -> TelnetBytes.WONT
         }
 
-        return listOf(TelnetBytes.IAC, encodedNegotiation) + escapeByte(message.option)
+        return listOf(TelnetBytes.IAC, encodedNegotiation, message.option)
     }
 
     /**
@@ -77,8 +77,7 @@ object TelnetEncoder {
      * @return the encoded message
      */
     private fun encodeSubnegotiationMessage(message: TelnetMessage.SubnegotiationMessage) =
-        listOf(TelnetBytes.IAC, TelnetBytes.SB) +
-        escapeByte(message.option) +
+        listOf(TelnetBytes.IAC, TelnetBytes.SB, message.option) +
         message.payload.flatMap { b -> escapeByte(b) } +
         listOf(TelnetBytes.IAC, TelnetBytes.SE)
 

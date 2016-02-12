@@ -101,7 +101,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
+    @Parameters(method = "allBytes", source = TelnetByteParameters::class)
     fun testEncodeDoNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.DO, TelnetBytes.DO)
 
@@ -110,7 +110,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
+    @Parameters(method = "allBytes", source = TelnetByteParameters::class)
     fun testEncodeDontNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.DONT, TelnetBytes.DONT)
 
@@ -119,7 +119,7 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
+    @Parameters(method = "allBytes", source = TelnetByteParameters::class)
     fun testEncodeWillNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.WILL, TelnetBytes.WILL)
 
@@ -128,45 +128,9 @@ class TelnetEncoderTest {
      * @param option The ID of the option to encode
      */
     @Test
-    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
+    @Parameters(method = "allBytes", source = TelnetByteParameters::class)
     fun testEncodeWontNonIac(option: Byte) =
             testEncodeOptionNegotiation(option, TelnetMessage.NegotiationMessage.Negotiation.WONT, TelnetBytes.WONT)
-
-    /**
-     * Test encoding a DO negotiation for an option that is an IAC byte
-     * @param option The ID of the option to encode
-     */
-    @Test
-    fun testEncodeDoIac() = testEncode(
-            TelnetMessage.NegotiationMessage(TelnetMessage.NegotiationMessage.Negotiation.DO, TelnetBytes.IAC),
-            listOf(TelnetBytes.IAC, TelnetBytes.DO, TelnetBytes.IAC, TelnetBytes.IAC))
-
-    /**
-     * Test encoding a DONT negotiation for an option that is an IAC byte
-     * @param option The ID of the option to encode
-     */
-    @Test
-    fun testEncodeDontIac() = testEncode(
-            TelnetMessage.NegotiationMessage(TelnetMessage.NegotiationMessage.Negotiation.DONT, TelnetBytes.IAC),
-            listOf(TelnetBytes.IAC, TelnetBytes.DONT, TelnetBytes.IAC, TelnetBytes.IAC))
-
-    /**
-     * Test encoding a WILL negotiation for an option that is an IAC byte
-     * @param option The ID of the option to encode
-     */
-    @Test
-    fun testEncodeWillIac() = testEncode(
-            TelnetMessage.NegotiationMessage(TelnetMessage.NegotiationMessage.Negotiation.WILL, TelnetBytes.IAC),
-            listOf(TelnetBytes.IAC, TelnetBytes.WILL, TelnetBytes.IAC, TelnetBytes.IAC))
-
-    /**
-     * Test encoding a WONT negotiation for an option that is an IAC byte
-     * @param option The ID of the option to encode
-     */
-    @Test
-    fun testEncodeWontIac() = testEncode(
-            TelnetMessage.NegotiationMessage(TelnetMessage.NegotiationMessage.Negotiation.WONT, TelnetBytes.IAC),
-            listOf(TelnetBytes.IAC, TelnetBytes.WONT, TelnetBytes.IAC, TelnetBytes.IAC))
 
     /**
      * Test encoding an Option Negotiation
@@ -185,18 +149,10 @@ class TelnetEncoderTest {
      * @param option The Option ID
      */
     @Test
-    @Parameters(method = "nonIacBytes", source = TelnetByteParameters::class)
+    @Parameters(method = "allBytes", source = TelnetByteParameters::class)
     fun testEncodeEmptyOptionSubnegotiation(option: Byte) = testEncode(
             TelnetMessage.SubnegotiationMessage(option, listOf()),
             listOf(TelnetBytes.IAC, TelnetBytes.SB, option, TelnetBytes.IAC, TelnetBytes.SE))
-
-    /**
-     * Test encoding an Option Sub-negotiation where the option ID is an IAC byte and the payload is empty
-     */
-    @Test
-    fun testEncodeEmptyIACOptionSubnegotiation() = testEncode(
-            TelnetMessage.SubnegotiationMessage(TelnetBytes.IAC, listOf()),
-            listOf(TelnetBytes.IAC, TelnetBytes.SB, TelnetBytes.IAC, TelnetBytes.IAC, TelnetBytes.IAC, TelnetBytes.SE))
 
     /**
      * Test encoding an Option Sub-negotiation where the option ID is a non-IAC byte and the payload is a single non-IAC byte

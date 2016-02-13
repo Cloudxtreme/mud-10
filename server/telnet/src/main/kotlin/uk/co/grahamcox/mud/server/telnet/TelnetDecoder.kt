@@ -60,6 +60,18 @@ sealed class TelnetDecoderState {
     }
 
     /**
+     * Representation of being in a Subnegotiation, about to receive the Option ID
+     */
+    object SubnegotiationOptionState : TelnetDecoderState() {
+        /**
+         * The next byte is the Option ID of the option we are sub-negotiating
+         * @param b The byte to check
+         * @return the result of handling the byte
+         */
+        override fun injectByte(b: Byte) =
+                InjectionResponse(SubnegotiationPayloadState(b, listOf()))
+    }
+    /**
      * Representation of being in a Subnegotiation, whilst decoding the Payload
      * @property option The option being negotiated
      * @property payload The payload so far

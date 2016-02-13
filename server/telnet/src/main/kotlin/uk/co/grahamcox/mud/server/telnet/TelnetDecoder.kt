@@ -60,6 +60,24 @@ sealed class TelnetDecoderState {
     }
 
     /**
+     * Representation of being in a Subnegotiation, whilst decoding the Payload
+     * @property option The option being negotiated
+     * @property payload The payload so far
+     */
+    class SubnegotiationPayloadState(val option: Byte, val payload: List<Byte>) : TelnetDecoderState() {
+        /**
+         * If the byte we have just received is an IAC then we need to move to the SubnegotiationIACState because
+         * the next one might be the SE to end negotiation
+         * @param b The byte to check
+         * @return the result of handling the byte
+         */
+        override fun injectByte(b: Byte) = when (b) {
+            TelnetBytes.IAC -> InjectionResponse(SubnegotiationIACState(option, payload))
+            else -> InjectionResponse(SubnegotiationPayloadState(option, payload + b))
+        }
+    }
+
+    /**
      * Representation of being in a Subnegotiation, having just received an IAC as the Payload
      * @property option The option being negotiated
      * @property payload The payload so far

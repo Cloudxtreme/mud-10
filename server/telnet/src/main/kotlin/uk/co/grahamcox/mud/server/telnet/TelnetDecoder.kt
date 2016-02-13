@@ -43,7 +43,32 @@ sealed class TelnetDecoderState {
          * @param b The byte to check
          * @return the result of handling the byte
          */
-        override fun injectByte(b: Byte) = InjectionResponse(NoState, TelnetMessage.ByteMessage(b))
+        override fun injectByte(b: Byte) = when(b) {
+            TelnetBytes.NOP -> InjectionResponse(NoState)
+            TelnetBytes.DataMark ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.DATA_MARK))
+            TelnetBytes.Break ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.BREAK))
+            TelnetBytes.InterruptProcess ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.INTERRUPT_PROCESS))
+            TelnetBytes.AbortOutput ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.ABORT_OUTPUT))
+            TelnetBytes.AreYouThere ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.ARE_YOU_THERE))
+            TelnetBytes.EraseCharacter ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.ERASE_CHARACTER))
+            TelnetBytes.EraseLine ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.ERASE_LINE))
+            TelnetBytes.GoAhead ->
+                InjectionResponse(NoState, TelnetMessage.CommandMessage(TelnetMessage.CommandMessage.Command.GO_AHEAD))
+            TelnetBytes.SB -> InjectionResponse(SubnegotiationOptionState)
+            TelnetBytes.WILL-> InjectionResponse(NegotiationState(TelnetMessage.NegotiationMessage.Negotiation.WILL))
+            TelnetBytes.WONT -> InjectionResponse(NegotiationState(TelnetMessage.NegotiationMessage.Negotiation.WONT))
+            TelnetBytes.DO -> InjectionResponse(NegotiationState(TelnetMessage.NegotiationMessage.Negotiation.DO))
+            TelnetBytes.DONT -> InjectionResponse(NegotiationState(TelnetMessage.NegotiationMessage.Negotiation.DONT))
+            TelnetBytes.IAC -> InjectionResponse(NoState, TelnetMessage.ByteMessage(TelnetBytes.IAC))
+            else -> InjectionResponse(NoState, TelnetMessage.ByteMessage(b))
+        }
     }
 
     /**

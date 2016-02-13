@@ -68,6 +68,40 @@ sealed class TelnetMessage {
             /** The Go Ahead command */
             GO_AHEAD
         }
+
+        /**
+         * Compare to another object for equality
+         * @param other The other object to compare to
+         * @return True if the two are equal. False if not
+         */
+        override fun equals(other: Any?): Boolean{
+            if (this === other) return true
+            if (other?.javaClass != javaClass) return false
+
+            other as CommandMessage
+
+            if (command != other.command) return false
+
+            return true
+        }
+
+        /**
+         * Generate a Hashcode for the message
+         * @return the Hashcode
+         */
+        override fun hashCode(): Int{
+            return command.hashCode()
+        }
+
+        /**
+         * Generate a String for the message
+         * @return the string
+         */
+        override fun toString(): String{
+            return "CommandMessage(command=$command)"
+        }
+
+
     }
 
     /**

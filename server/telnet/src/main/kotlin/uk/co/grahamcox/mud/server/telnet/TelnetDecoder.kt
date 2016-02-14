@@ -1,5 +1,7 @@
 package uk.co.grahamcox.mud.server.telnet
 
+import org.slf4j.LoggerFactory
+
 /**
  * Representation of the current state of the Telnet Decoder
  */
@@ -130,5 +132,28 @@ sealed class TelnetDecoderState {
             TelnetBytes.SE -> InjectionResponse(NoState, TelnetMessage.SubnegotiationMessage(option, payload))
             else -> InjectionResponse(SubnegotiationIACState(option, payload + b))
         }
+    }
+}
+
+/**
+ * The actual Decoder to decode telnet byte streams
+ */
+class TelnetDecoder {
+    /** the logger to use */
+    private val LOG = LoggerFactory.getLogger(TelnetDecoder::class.java)
+
+    /** The current state of the decoder */
+    private var currentState: TelnetDecoderState = TelnetDecoderState.NoState
+
+    /**
+     * Inject a byte into the decoder, and return the message produced if any
+     * @param b The byte to inject
+     * @return the produced message, if one was produced. Null if no message was produced
+     */
+    fun inject(b: Byte) : TelnetMessage? {
+        val response = currentState.injectByte(b)
+        LOG.debug("Injecting byte {} into state {} resulted in {}", b, currentState, response)
+        currentState = response.newState
+        return response.message
     }
 }

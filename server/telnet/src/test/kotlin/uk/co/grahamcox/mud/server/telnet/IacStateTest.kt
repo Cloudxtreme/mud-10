@@ -63,67 +63,13 @@ class IacStateTest {
     }
 
     /**
-     * Test decoding a DataMark byte
-     */
-    @Test
-    fun testDataMark() =
-            testCommand(TelnetBytes.DataMark, TelnetMessage.CommandMessage.Command.DATA_MARK)
-
-    /**
-     * Test decoding a Break byte
-     */
-    @Test
-    fun testBreak() =
-            testCommand(TelnetBytes.Break, TelnetMessage.CommandMessage.Command.BREAK)
-
-    /**
-     * Test decoding an Interrupt Process byte
-     */
-    @Test
-    fun testInterruptProcess() =
-            testCommand(TelnetBytes.InterruptProcess, TelnetMessage.CommandMessage.Command.INTERRUPT_PROCESS)
-
-    /**
-     * Test decoding an Abort Output byte
-     */
-    @Test
-    fun testAbortOutput() =
-            testCommand(TelnetBytes.AbortOutput, TelnetMessage.CommandMessage.Command.ABORT_OUTPUT)
-
-    /**
-     * Test decoding an Are You There byte
-     */
-    @Test
-    fun testAreYouThere() =
-            testCommand(TelnetBytes.AreYouThere, TelnetMessage.CommandMessage.Command.ARE_YOU_THERE)
-
-    /**
-     * Test decoding an Erase Character byte
-     */
-    @Test
-    fun testEraseCharacter() =
-            testCommand(TelnetBytes.EraseCharacter, TelnetMessage.CommandMessage.Command.ERASE_CHARACTER)
-
-    /**
-     * Test decoding an Erase Line byte
-     */
-    @Test
-    fun testEraseLine() =
-            testCommand(TelnetBytes.EraseLine, TelnetMessage.CommandMessage.Command.ERASE_LINE)
-
-    /**
-     * Test decoding a GoAhead byte
-     */
-    @Test
-    fun testGoAhead() =
-            testCommand(TelnetBytes.GoAhead, TelnetMessage.CommandMessage.Command.GO_AHEAD)
-
-    /**
      * Test decoding any Command byte
      * @param b The byte to decode
      * @param command The expected command
      */
-    private fun testCommand(b: Byte, command: TelnetMessage.CommandMessage.Command) {
+    @Test
+    @Parameters(method = "commandParameters", source = TelnetByteParameters::class)
+    fun testCommand(b: Byte, command: TelnetMessage.CommandMessage.Command) {
         val result = TelnetDecoderState.IACState.injectByte(b)
         Assert.assertEquals(TelnetDecoderState.NoState, result.newState)
         Assert.assertEquals(TelnetMessage.CommandMessage(command), result.message)

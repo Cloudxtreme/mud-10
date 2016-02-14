@@ -31,67 +31,13 @@ class TelnetEncoderTest {
     )
 
     /**
-     * Test encoding the Data Mark command
-     */
-    @Test
-    fun testEncodeDataMarkCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.DATA_MARK, TelnetBytes.DataMark)
-
-    /**
-     * Test encoding the Break command
-     */
-    @Test
-    fun testEncodeBreakCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.BREAK, TelnetBytes.Break)
-
-    /**
-     * Test encoding the Interrupt Process command
-     */
-    @Test
-    fun testEncodeInterruptProcessCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.INTERRUPT_PROCESS, TelnetBytes.InterruptProcess)
-
-    /**
-     * Test encoding the Abort Output command
-     */
-    @Test
-    fun testEncodeAbortOutputCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.ABORT_OUTPUT, TelnetBytes.AbortOutput)
-
-    /**
-     * Test encoding the Are You There command
-     */
-    @Test
-    fun testEncodeAreYouThereCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.ARE_YOU_THERE, TelnetBytes.AreYouThere)
-
-    /**
-     * Test encoding the Erase Character command
-     */
-    @Test
-    fun testEncodeEraseCharacterCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.ERASE_CHARACTER, TelnetBytes.EraseCharacter)
-
-    /**
-     * Test encoding the Erase Line command
-     */
-    @Test
-    fun testEncodeEraseLineCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.ERASE_LINE, TelnetBytes.EraseLine)
-
-    /**
-     * Test encoding the Go Ahead command
-     */
-    @Test
-    fun testEncodeGoAheadCommand() =
-            testEncodeCommand(TelnetMessage.CommandMessage.Command.GO_AHEAD, TelnetBytes.GoAhead)
-
-    /**
      * Test encoding a command message
      * @param command The command to encode
      * @param commandByte The byte the command encodes to
      */
-    private fun testEncodeCommand(command: TelnetMessage.CommandMessage.Command, commandByte: Byte) = testEncode(
+    @Test
+    @Parameters(method = "commandParameters", source = TelnetByteParameters::class)
+    fun testEncodeCommand(commandByte: Byte, command: TelnetMessage.CommandMessage.Command) = testEncode(
             TelnetMessage.CommandMessage(command),
             listOf(TelnetBytes.IAC, commandByte)
     )

@@ -130,7 +130,7 @@ sealed class TelnetDecoderState {
          */
         override fun injectByte(b: Byte) = when (b) {
             TelnetBytes.SE -> InjectionResponse(NoState, TelnetMessage.SubnegotiationMessage(option, payload))
-            else -> InjectionResponse(SubnegotiationIACState(option, payload + b))
+            else -> InjectionResponse(SubnegotiationPayloadState(option, payload + b))
         }
     }
 }

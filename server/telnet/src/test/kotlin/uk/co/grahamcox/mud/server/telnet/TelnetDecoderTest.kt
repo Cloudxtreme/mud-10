@@ -56,6 +56,19 @@ class TelnetDecoderTest {
         )
     }
 
+    /**
+     * Generate a parameter that represents every possible command in a single buffer
+     */
+    fun allCommandParameters() = listOf(
+        arrayOf(
+            TelnetByteParameters().commandByteMapping().flatMap { entry -> listOf(TelnetBytes.IAC, entry.key) },
+            TelnetByteParameters().commandByteMapping().map { entry -> TelnetMessage.CommandMessage(entry.value) }
+        )
+    )
+
+    /**
+     * Generate all of the parameters that represent every possible negotiation
+     */
     fun negotiationParameters() = TelnetByteParameters().negotiationByteMapping().flatMap { entry ->
         TelnetByteParameters().allBytes().map { option ->
             arrayOf(
@@ -64,6 +77,17 @@ class TelnetDecoderTest {
             )
         }
     }
+
+    /**
+     * Generate a parameter for a Subnegotiation
+     */
+    fun subnegotiationParameters() = listOf(
+        arrayOf(
+            listOf(TelnetBytes.IAC, TelnetBytes.SB, 15, 1, 2, TelnetBytes.IAC, TelnetBytes.IAC, TelnetBytes.IAC, TelnetBytes.SE),
+            listOf(TelnetMessage.SubnegotiationMessage(15, listOf(1, 2, TelnetBytes.IAC)))
+        )
+    )
+
     /**
      * Produce the parameters for the actual test
      * @return the parameters. This is a list of pairs of lists
@@ -71,5 +95,7 @@ class TelnetDecoderTest {
     fun parametersForTestDecoder() = singleByteParameters() +
         commandParameters() +
         negotiationParameters() +
-        allByteParameters()
+        subnegotiationParameters() +
+        allByteParameters() +
+        allCommandParameters()
 }

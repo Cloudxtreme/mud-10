@@ -24,9 +24,9 @@ class SubnegotiationIACStateTest {
     fun testNonSEByte(b: Byte) {
         val state = TelnetDecoderState.SubnegotiationIACState(15, listOf(1, 2, 3))
         val result = state.injectByte(b)
-        Assert.assertTrue(result.newState is TelnetDecoderState.SubnegotiationIACState)
+        Assert.assertTrue(result.newState is TelnetDecoderState.SubnegotiationPayloadState)
 
-        val newState = result.newState as TelnetDecoderState.SubnegotiationIACState
+        val newState = result.newState as TelnetDecoderState.SubnegotiationPayloadState
         Assert.assertEquals(15.toByte(), newState.option)
         Assert.assertEquals(listOf(1, 2, 3, b), newState.payload)
         Assert.assertNull(result.message)

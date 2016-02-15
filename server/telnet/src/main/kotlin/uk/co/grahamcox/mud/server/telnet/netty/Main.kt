@@ -1,4 +1,6 @@
-package uk.co.grahamcox.mud.server.telnet
+package uk.co.grahamcox.mud.server.telnet.netty
+
+import uk.co.grahamcox.mud.server.telnet.netty.Server
 
 /**
  * Main entry point, for now

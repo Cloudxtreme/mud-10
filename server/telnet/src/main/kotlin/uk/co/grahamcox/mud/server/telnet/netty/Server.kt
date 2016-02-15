@@ -1,4 +1,4 @@
-package uk.co.grahamcox.mud.server.telnet
+package uk.co.grahamcox.mud.server.telnet.netty
 
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture

@@ -1,4 +1,4 @@
-package uk.co.grahamcox.mud.server.telnet
+package uk.co.grahamcox.mud.server.telnet.netty
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
@@ -28,6 +28,7 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
      * @param channel The channel to initialize<
      */
     override fun initChannel(channel: SocketChannel) {
+        channel.pipeline().addLast(TelnetMessageDecoder())
         channel.pipeline().addLast(DiscardHandler())
     }
 }

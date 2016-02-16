@@ -21,11 +21,7 @@ class TelnetMessageDecoder : ByteToMessageDecoder() {
      */
     override fun decode(ctx: ChannelHandlerContext, input: ByteBuf, output: MutableList<Any>) {
         val decoderAttribute = ctx.attr(decoderAttributeKey)
-        if (decoderAttribute.get() == null) {
-            decoderAttribute.set(TelnetDecoder())
-        }
-
-        val decoder = decoderAttribute.get()
+        val decoder = decoderAttribute.getOrSet { TelnetDecoder() }
 
         while (input.isReadable) {
             val message = decoder.inject(input.readByte())

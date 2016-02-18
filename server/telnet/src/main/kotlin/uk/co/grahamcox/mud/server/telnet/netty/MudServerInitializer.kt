@@ -7,6 +7,7 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.util.ReferenceCountUtil
 import org.slf4j.LoggerFactory
 import uk.co.grahamcox.mud.server.telnet.options.EchoOption
+import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.SuppressGoAheadOption
 
@@ -39,7 +40,8 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
                 SuppressGoAheadOption(),
                 EchoOption()
         ), serverOptions = listOf(
-                SuppressGoAheadOption()
+                SuppressGoAheadOption(),
+                NAWSOption()
         ))
 
         channel.pipeline().addLast(TelnetMessageDecoder())

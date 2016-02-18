@@ -46,6 +46,17 @@ class TelnetOptionHandler(private val optionManager : OptionManager) : ChannelIn
                     LOG.warn("Received negotiation for unknown option: {}", msg)
                 }
             }
+            is TelnetMessage.SubnegotiationMessage -> {
+                // We don't know if it was a Client or Server option, so assume both
+                optionManager.getClientOption(msg.option)?.let {
+                    LOG.debug("Received subnegotiation {} for option {}", msg, it)
+                    it.receiveSubnegotiation(msg.payload)
+                }
+                optionManager.getServerOption(msg.option)?.let {
+                    LOG.debug("Received subnegotiation {} for option {}", msg, it)
+                    it.receiveSubnegotiation(msg.payload)
+                }
+            }
             else -> super.channelRead(ctx, msg)
         }
     }

@@ -35,6 +35,12 @@ abstract class TelnetOption {
         }
 
     /**
+     * Receive the payload from a Subnegotiation message
+     * @param payload The payload to process
+     */
+    open fun receiveSubnegotiation(payload: List<Byte>) {}
+
+    /**
      * Check if the option has been enabled. This means that exactly one of the clientState and serverState is set to DO, and the other is set to WILL
      * @return true if the option is enabled. False if not
      */

@@ -42,6 +42,7 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
                 TerminalTypeOption(channel)
         ))
 
+        channel.pipeline().addLast(LoggingChannelHandler())
         channel.pipeline().addLast(TelnetMessageDecoder())
         channel.pipeline().addLast(TelnetMessageEncoder())
         channel.pipeline().addLast(TelnetOptionHandler(optionManager))

@@ -6,10 +6,7 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.util.ReferenceCountUtil
 import org.slf4j.LoggerFactory
-import uk.co.grahamcox.mud.server.telnet.options.EchoOption
-import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
-import uk.co.grahamcox.mud.server.telnet.options.OptionManager
-import uk.co.grahamcox.mud.server.telnet.options.SuppressGoAheadOption
+import uk.co.grahamcox.mud.server.telnet.options.*
 
 class DiscardHandler : ChannelInboundHandlerAdapter() {
     private val LOG = LoggerFactory.getLogger(DiscardHandler::class.java)
@@ -41,7 +38,8 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
                 EchoOption()
         ), serverOptions = listOf(
                 SuppressGoAheadOption(),
-                NAWSOption()
+                NAWSOption(),
+                TerminalTypeOption(channel)
         ))
 
         channel.pipeline().addLast(TelnetMessageDecoder())

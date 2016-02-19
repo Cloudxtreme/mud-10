@@ -15,14 +15,14 @@ object TelnetEncoder {
      * @reutrn the list of bytes
      */
     fun encode(message: TelnetMessage): List<Byte> {
-        LOG.debug("Encoding message {}", message)
+        LOG.trace("Encoding message {}", message)
         val encoded: List<Byte> = when (message) {
             is TelnetMessage.ByteMessage -> encodeByteMessage(message)
             is TelnetMessage.CommandMessage -> encodeCommandMessage(message)
             is TelnetMessage.NegotiationMessage -> encodeNegotiationMessage(message)
             is TelnetMessage.SubnegotiationMessage -> encodeSubnegotiationMessage(message)
         }
-        LOG.debug("Encoded message {} into {}", message, encoded)
+        LOG.trace("Encoded message {} into {}", message, encoded)
 
         return encoded
     }

@@ -152,7 +152,7 @@ class TelnetDecoder {
      */
     fun inject(b: Byte) : TelnetMessage? {
         val response = currentState.injectByte(b)
-        LOG.debug("Injecting byte {} into state {} resulted in {}", b, currentState, response)
+        LOG.trace("Injecting byte {} into state {} resulted in {}", b, currentState, response)
         currentState = response.newState
         return response.message
     }

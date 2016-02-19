@@ -20,9 +20,25 @@ abstract class TelnetOption {
 
     /** The state of the option as requested by the client */
     var clientState: TelnetMessage.NegotiationMessage.Negotiation? = null
+        set(value) {
+            val oldState = state
+            field = value
+            val newState = state
+            if (oldState != newState) {
+                handleStateChanged(oldState, newState)
+            }
+        }
 
     /** The state of the option as requested by the server */
     var serverState: TelnetMessage.NegotiationMessage.Negotiation? = null
+        set(value) {
+            val oldState = state
+            field = value
+            val newState = state
+            if (oldState != newState) {
+                handleStateChanged(oldState, newState)
+            }
+        }
 
     /** The current state of the option */
     val state: OptionState
@@ -39,6 +55,13 @@ abstract class TelnetOption {
      * @param payload The payload to process
      */
     open fun receiveSubnegotiation(payload: List<Byte>) {}
+
+    /**
+     * Handle the fact that the state of the option has just changed
+     * @param oldState The old state of the option
+     * @param newState The new state of the option
+     */
+    open fun handleStateChanged(oldState: OptionState, newState: OptionState) {}
 
     /**
      * Check if the option has been enabled. This means that exactly one of the clientState and serverState is set to DO, and the other is set to WILL

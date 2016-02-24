@@ -1,5 +1,6 @@
-package uk.co.grahamcox.mud.server.telnet.netty
+package uk.co.grahamcox.mud.server.telnet
 
+import uk.co.grahamcox.mud.server.telnet.netty.MudServerInitializer
 import uk.co.grahamcox.mud.server.telnet.netty.Server
 
 /**

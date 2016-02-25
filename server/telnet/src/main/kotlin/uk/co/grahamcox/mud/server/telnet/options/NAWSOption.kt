@@ -10,6 +10,16 @@ class NAWSOption() : TelnetOption() {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(NAWSOption::class.java)
 
+    /** Event name for when the state of the option changes */
+    val WINDOW_SIZE_CHANGED_EVENT = NAWSOption::class.qualifiedName + "WindowSizeChanged"
+
+    /**
+     * Representation of the window size as a payload in the Window Size Changed Event
+     * @property width The width of the window
+     * @property height The height of the window
+     */
+    data class WindowSizePayload(val width: Int, val height: Int)
+
     /** The Option ID - 31 */
     override val optionId: Byte = 31
 
@@ -28,9 +38,14 @@ class NAWSOption() : TelnetOption() {
      */
     override fun receiveSubnegotiation(payload: List<Byte>) {
         if (payload.size == 4) {
-            width = (unsignByte(payload[0]) * 256) + unsignByte(payload[1])
-            height = (unsignByte(payload[2]) * 256) + unsignByte(payload[3])
+            val width = (unsignByte(payload[0]) * 256) + unsignByte(payload[1])
+            val height = (unsignByte(payload[2]) * 256) + unsignByte(payload[3])
+
+            this.width = width
+            this.height = height
+
             LOG.debug("Received new window size of {} x {}", width, height)
+            eventManager.fire(WINDOW_SIZE_CHANGED_EVENT, WindowSizePayload(height, width))
         } else {
             LOG.warn("Received invalid payload. Expected 4 bytes but got {}", payload.size)
         }

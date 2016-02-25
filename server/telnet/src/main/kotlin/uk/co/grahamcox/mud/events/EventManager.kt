@@ -1,9 +1,14 @@
 package uk.co.grahamcox.mud.events
 
+import org.slf4j.LoggerFactory
+
 /**
  * Event Manager that can be used to fire events and manage listeners
  */
 class EventManager {
+    /** The logger to use */
+    private val LOG = LoggerFactory.getLogger(EventManager::class.java)
+
     /**
      * Representation of an event handler
      * @property filter Functor to determine if this handler can handle this event
@@ -55,10 +60,14 @@ class EventManager {
      * @param event The event to fire
      */
     fun fire(event: Event<*>) {
+        LOG.debug("Firing event {}", event)
         listeners
                 .filter { h -> h.filter(event) }
                 .map { h -> h.handler }
-                .forEach { h -> h(event) }
+                .forEach { h ->
+                    LOG.debug("Firing event {} to handler {}", event, h)
+                    h(event)
+                }
     }
 
     /**

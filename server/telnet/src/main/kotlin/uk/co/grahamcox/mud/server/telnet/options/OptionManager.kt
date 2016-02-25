@@ -28,7 +28,7 @@ class OptionManager(val clientOptions: List<TelnetOption>, val serverOptions: Li
      * @param optionClass The class of the option
      * @return the option, or null if not known
      */
-    fun getClientOption(optionClass: Class<TelnetOption>) = clientOptionsMap.get(optionClass) ?: throw IllegalArgumentException("No option of that type is known: ${optionClass}")
+    fun getClientOption(optionClass: Class<*>) = clientOptionsMap.get(optionClass) ?: throw IllegalArgumentException("No option of that type is known: ${optionClass}")
 
     /**
      * Get the Server Option that has the given Option ID. If none is known then null is returned
@@ -42,5 +42,5 @@ class OptionManager(val clientOptions: List<TelnetOption>, val serverOptions: Li
      * @param optionClass The class of the option
      * @return the option, or null if not known
      */
-    fun getServerOption(optionClass: Class<TelnetOption>) = serverOptionsMap.get(optionClass) ?: throw IllegalArgumentException("No option of that type is known: ${optionClass}")
+    fun getServerOption(optionClass: Class<*>) = serverOptionsMap.get(optionClass) ?: throw IllegalArgumentException("No option of that type is known: ${optionClass}")
 }

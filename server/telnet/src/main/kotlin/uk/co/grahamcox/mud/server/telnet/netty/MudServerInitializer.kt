@@ -7,8 +7,9 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.util.ReferenceCountUtil
 import org.slf4j.LoggerFactory
 import uk.co.grahamcox.mud.server.telnet.options.*
+import uk.co.grahamcox.mud.server.telnet.ui.UI
 
-class DiscardHandler : ChannelInboundHandlerAdapter() {
+class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
     private val LOG = LoggerFactory.getLogger(DiscardHandler::class.java)
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
@@ -42,11 +43,14 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
                 TerminalTypeOption(channel)
         ))
 
+        val ui = UI(optionManager)
+
         channel.pipeline().addLast(LoggingChannelHandler())
         channel.pipeline().addLast(TelnetMessageDecoder())
         channel.pipeline().addLast(TelnetMessageEncoder())
         channel.pipeline().addLast(TelnetOptionHandler(optionManager))
 
-        channel.pipeline().addLast(DiscardHandler())
+        channel.pipeline().addLast(DiscardHandler(ui))
+
     }
 }

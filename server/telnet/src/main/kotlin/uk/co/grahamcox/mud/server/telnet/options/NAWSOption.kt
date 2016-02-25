@@ -10,7 +10,7 @@ class NAWSOption() : TelnetOption() {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(NAWSOption::class.java)
 
-    /** Event name for when the state of the option changes */
+    /** Event name for when the window size changes */
     val WINDOW_SIZE_CHANGED_EVENT = NAWSOption::class.qualifiedName + "WindowSizeChanged"
 
     /**

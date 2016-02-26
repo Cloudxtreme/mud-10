@@ -7,11 +7,13 @@ import uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler
  * Representation of the Negotiate About Window Size option - RFC-1073
  */
 class NAWSOption() : TelnetOption() {
-    /** The logger to use */
-    private val LOG = LoggerFactory.getLogger(NAWSOption::class.java)
+    companion object {
+        /** The logger to use */
+        private val LOG = LoggerFactory.getLogger(NAWSOption::class.java)
 
-    /** Event name for when the window size changes */
-    val WINDOW_SIZE_CHANGED_EVENT = NAWSOption::class.qualifiedName + "WindowSizeChanged"
+        /** Event name for when the window size changes */
+        val WINDOW_SIZE_CHANGED_EVENT = NAWSOption::class.qualifiedName + "WindowSizeChanged"
+    }
 
     /**
      * Representation of the window size as a payload in the Window Size Changed Event

@@ -13,10 +13,10 @@ class UI(private val optionManager: OptionManager) {
     private val LOG = LoggerFactory.getLogger(UI::class.java)
 
     init {
-        optionManager.getServerOption(NAWSOption::class.java).eventManager.registerListener("uk.co.grahamcox.mud.server.telnet.options.NAWSOptionWindowSizeChanged") {
+        optionManager.getServerOption(NAWSOption::class.java).eventManager.registerListener(NAWSOption.WINDOW_SIZE_CHANGED_EVENT) {
             e -> windowSizeChanged(e.payload as NAWSOption.WindowSizePayload)
         }
-        optionManager.getServerOption(TerminalTypeOption::class.java).eventManager.registerListener("uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOptionTerminalTypeChanged") {
+        optionManager.getServerOption(TerminalTypeOption::class.java).eventManager.registerListener(TerminalTypeOption.TERMINAL_TYPE_CHANGED_EVENT) {
             e -> terminalTypeChanged(e.payload as String)
         }
     }

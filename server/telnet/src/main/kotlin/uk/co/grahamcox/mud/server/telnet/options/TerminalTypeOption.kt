@@ -11,14 +11,16 @@ import java.nio.charset.Charset
  * @property channel The channel to communicate over
  */
 class TerminalTypeOption(private val channel: SocketChannel) : TelnetOption() {
-    /** The logger to use */
-    private val LOG = LoggerFactory.getLogger(TerminalTypeOption::class.java)
+    companion object {
+        /** The logger to use */
+        private val LOG = LoggerFactory.getLogger(TerminalTypeOption::class.java)
 
-    /** Event name for when the list of terminal names is available */
-    val RECEIVED_TERMINAL_NAMES_EVENT = TerminalTypeOption::class.qualifiedName + "ReceivedTerminalNames"
+        /** Event name for when the list of terminal names is available */
+        val RECEIVED_TERMINAL_NAMES_EVENT = TerminalTypeOption::class.qualifiedName + "ReceivedTerminalNames"
 
-    /** Event name for when the selected terminal type has changed */
-    val TERMINAL_TYPE_CHANGED_EVENT = TerminalTypeOption::class.qualifiedName + "TerminalTypeChanged"
+        /** Event name for when the selected terminal type has changed */
+        val TERMINAL_TYPE_CHANGED_EVENT = TerminalTypeOption::class.qualifiedName + "TerminalTypeChanged"
+    }
 
     /** The payload for requesting that the client sends the next Terminal Type to the server */
     private val SEND: Byte = 1

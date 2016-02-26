@@ -7,8 +7,10 @@ import uk.co.grahamcox.mud.server.telnet.TelnetMessage
  * Representation of a Telnet Option that we support
  */
 abstract class TelnetOption {
-    /** Event name for when the state of the option changes */
-    val STATE_CHANGED_EVENT = TelnetOption::class.qualifiedName + "StateChanged"
+    companion object {
+        /** Event name for when the state of the option changes */
+        val STATE_CHANGED_EVENT = TelnetOption::class.qualifiedName + "StateChanged"
+    }
 
     /** The state of the option */
     enum class OptionState {

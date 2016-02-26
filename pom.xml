@@ -43,6 +43,7 @@
         <version.kotlin>1.0.0</version.kotlin>
         <version.maven>3.2.1</version.maven>
         <version.slf4j>1.7.16</version.slf4j>
+        <version.spring>4.2.5.RELEASE</version.spring>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -106,6 +107,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${version.spring}</version>
             </dependency>
             <dependency>
                 <groupId>pl.pragmatists</groupId>

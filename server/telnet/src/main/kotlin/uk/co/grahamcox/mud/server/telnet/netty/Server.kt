@@ -14,27 +14,35 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
  * @property port The port to listen on
  * @property initializer The initializer to use for the client channels
  */
-class Server(val port: Int, private val initializer: ChannelInitializer<SocketChannel>) {
-    /** The future representing the channel */
+class Server(private val port: Int, private val initializer: ChannelInitializer<SocketChannel>) {
+    /** The main event loop group */
+    private val bossGroup: NioEventLoopGroup
+
+    /** The worker event loop group */
+    private val workerGroup: NioEventLoopGroup
+
+    /** The channel future for the server */
     private val channelFuture: ChannelFuture
 
     init {
-        val bossGroup = NioEventLoopGroup()
-        val workerGroup = NioEventLoopGroup()
-        try {
-            val bootstrap = ServerBootstrap()
-            bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel::class.java)
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childHandler(initializer)
+        bossGroup = NioEventLoopGroup()
+        workerGroup = NioEventLoopGroup()
 
-            channelFuture = bootstrap.bind(port).sync()
+        val bootstrap = ServerBootstrap()
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel::class.java)
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childHandler(initializer)
 
-            channelFuture.channel().closeFuture().sync()
-        } finally {
-            workerGroup.shutdownGracefully()
-            bossGroup.shutdownGracefully()
-        }
+        channelFuture = bootstrap.bind(port).sync()
+    }
+
+    /**
+     * Shutdown the server
+     */
+    fun shutdown() {
+        workerGroup.shutdownGracefully()
+        bossGroup.shutdownGracefully()
     }
 }

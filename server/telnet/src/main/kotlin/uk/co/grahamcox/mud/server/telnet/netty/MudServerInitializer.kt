@@ -43,7 +43,7 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
                 TerminalTypeOption(channel)
         ))
 
-        val ui = UI(optionManager)
+        val ui = UI(optionManager, channel)
 
         channel.pipeline().addLast(LoggingChannelHandler())
         channel.pipeline().addLast(TelnetMessageDecoder())

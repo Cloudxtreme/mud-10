@@ -47,7 +47,7 @@ class NAWSOption() : TelnetOption() {
             this.height = height
 
             LOG.debug("Received new window size of {} x {}", width, height)
-            eventManager.fire(WINDOW_SIZE_CHANGED_EVENT, WindowSizePayload(height, width))
+            eventManager.fire(WINDOW_SIZE_CHANGED_EVENT, WindowSizePayload(width, height))
         } else {
             LOG.warn("Received invalid payload. Expected 4 bytes but got {}", payload.size)
         }

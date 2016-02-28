@@ -54,13 +54,21 @@ class UI(private val optionManager: OptionManager, private val channel: SocketCh
      */
     private fun renderUI() {
         val ESC: Char = 27.toByte().toChar()
-        "${ESC}[2J${ESC}[0;0H".toByteArray()
+        "${ESC}[2J".toByteArray()
             .map { b -> TelnetMessage.ByteMessage(b) }
             .forEach { m -> channel.write(m) }
-        "Window size is ${windowSize?.width}x${windowSize?.height}\n\r".toByteArray()
-            .map { b -> TelnetMessage.ByteMessage(b) }
-            .forEach { m -> channel.write(m) }
-        "Terminal Type is ${terminalType}\n\r".toByteArray()
+
+        val windowSizeMessage = "Window size is ${windowSize?.width}x${windowSize?.height}"
+        val terminalTypeMessage = "Terminal Type is ${terminalType}"
+        val messageLength = Math.max(windowSizeMessage.length, terminalTypeMessage.length)
+
+        val x = ((windowSize?.width ?: messageLength) - messageLength) / 2
+        val y = (windowSize?.height ?: 0) / 2
+
+        LOG.debug("Window size is {}", windowSize)
+        LOG.debug("Rendering message at {}x{}", x, y)
+
+        "${ESC}[${y};${x}H${windowSizeMessage}${ESC}[${y+1};${x}H${terminalTypeMessage}".toByteArray()
             .map { b -> TelnetMessage.ByteMessage(b) }
             .forEach { m -> channel.write(m) }
         channel.flush()

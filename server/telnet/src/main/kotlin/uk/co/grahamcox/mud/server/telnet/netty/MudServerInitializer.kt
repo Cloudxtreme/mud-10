@@ -6,7 +6,10 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.util.ReferenceCountUtil
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.BeanFactoryAware
 import uk.co.grahamcox.mud.server.telnet.options.*
+import uk.co.grahamcox.mud.server.telnet.spring.ConnectionScope
 import uk.co.grahamcox.mud.server.telnet.ui.UI
 
 class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
@@ -24,9 +27,15 @@ class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
 /**
  * Channel Initializer for the MUD
  */
-class MudServerInitializer : ChannelInitializer<SocketChannel>() {
+class MudServerInitializer : ChannelInitializer<SocketChannel>(), BeanFactoryAware {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(MudServerInitializer::class.java)
+
+    private lateinit var springBeanFactory: BeanFactory
+
+    override fun setBeanFactory(beanFactory: BeanFactory) {
+        this.springBeanFactory = beanFactory
+    }
 
     /**
      * Initialize the provided channel
@@ -34,14 +43,11 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
      */
     override fun initChannel(channel: SocketChannel) {
         LOG.info("Received a new connection from {}", channel)
-        val optionManager = OptionManager(clientOptions = listOf(
-                SuppressGoAheadOption(),
-                EchoOption()
-        ), serverOptions = listOf(
-                SuppressGoAheadOption(),
-                NAWSOption(),
-                TerminalTypeOption(channel)
-        ))
+
+        val connectionScope = springBeanFactory.getBean("connectionScope", ConnectionScope::class.java)
+        connectionScope.setActiveConnection(channel)
+
+        val optionManager = springBeanFactory.getBean(OptionManager::class.java)
 
         val ui = UI(optionManager, channel)
 
@@ -51,6 +57,7 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>() {
         channel.pipeline().addLast(TelnetOptionHandler(optionManager))
 
         channel.pipeline().addLast(DiscardHandler(ui))
-
+        
+        connectionScope.clearActiveConnection()
     }
 }

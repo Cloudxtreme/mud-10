@@ -2,6 +2,7 @@ package uk.co.grahamcox.mud.server.telnet
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import uk.co.grahamcox.mud.server.telnet.netty.Server
+import uk.co.grahamcox.mud.server.telnet.spring.ConnectionScope
 import uk.co.grahamcox.mud.server.telnet.spring.Context
 
 /**

@@ -1,5 +1,6 @@
 package uk.co.grahamcox.mud.server.telnet.spring
 
+import org.springframework.beans.factory.config.CustomScopeConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -19,4 +20,14 @@ open class Context {
     @Bean
     open fun propertyPlaceholderConfigurer() = PropertySourcesPlaceholderConfigurer()
 
+    /**
+     * Configure the custom scopes to use
+     * @return the custom scope configurer
+     */
+    @Bean
+    open fun customScopes(): CustomScopeConfigurer {
+        val configurer = CustomScopeConfigurer()
+        configurer.addScope("connection", ConnectionScope())
+        return configurer
+    }
 }

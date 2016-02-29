@@ -1,6 +1,5 @@
 package uk.co.grahamcox.mud.server.telnet.spring
 
-import io.netty.channel.Channel
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,6 +30,14 @@ open class TelnetContext {
     @Bean(destroyMethod = "shutdown")
     open fun telnetServer(@Value("\${portNumber}") port: Int,
                           initializer: ChannelInitializer<SocketChannel>) = Server(port, initializer)
+
+    /**
+     * Placeholder for the channel that the connection is on
+     * @return the channel
+     */
+    @Bean
+    @Scope("connection")
+    open fun channel(): SocketChannel? = null
 
     @Autowired
     @Bean

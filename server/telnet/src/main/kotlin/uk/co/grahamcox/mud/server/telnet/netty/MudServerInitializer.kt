@@ -1,5 +1,6 @@
 package uk.co.grahamcox.mud.server.telnet.netty
 
+import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.ChannelInitializer
@@ -27,7 +28,7 @@ class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
 /**
  * Channel Initializer for the MUD
  */
-class MudServerInitializer(private val connectionScope: ConnectionScope) : 
+class MudServerInitializer(private val connectionScope: ConnectionScope) :
         ChannelInitializer<SocketChannel>(), ApplicationContextAware {
     
     /** The logger to use */
@@ -47,17 +48,9 @@ class MudServerInitializer(private val connectionScope: ConnectionScope) :
         LOG.info("Received a new connection from {}", channel)
         connectionScope.setActiveConnection(channel)
 
-        val optionManager = springApplicationContext.getBean(OptionManager::class.java)
+        val handlers = springApplicationContext.getBean("channelHandlers", List::class.java) as List<ChannelHandler>
+        handlers.forEach { handler -> channel.pipeline().addLast(handler) }
 
-        val ui = UI(optionManager, channel)
-
-        channel.pipeline().addLast(LoggingChannelHandler())
-        channel.pipeline().addLast(TelnetMessageDecoder())
-        channel.pipeline().addLast(TelnetMessageEncoder())
-        channel.pipeline().addLast(TelnetOptionHandler(optionManager))
-
-        channel.pipeline().addLast(DiscardHandler(ui))
-        
         connectionScope.clearActiveConnection()
     }
 }

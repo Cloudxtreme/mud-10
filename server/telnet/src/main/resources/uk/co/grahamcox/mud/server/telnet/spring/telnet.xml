@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="uk.co.grahamcox.mud.server.telnet.netty.Server">
         <constructor-arg name="port" value="${server.port.telnet:12345}" />
@@ -15,7 +16,7 @@
     <!-- Note that this bean isn't actually created here. It's returned specially from the ConnectionScope object -->
     <bean id="channel" class="io.netty.channel.socket.SocketChannel" scope="connection" lazy-init="true" />
 
-    <bean class="uk.co.grahamcox.mud.server.telnet.options.OptionManager" scope="connection">
+    <bean id="optionManager" class="uk.co.grahamcox.mud.server.telnet.options.OptionManager" scope="connection">
         <constructor-arg name="clientOptions">
             <list>
                 <bean class="uk.co.grahamcox.mud.server.telnet.options.SuppressGoAheadOption" scope="connection" />
@@ -32,4 +33,21 @@
             </list>
         </constructor-arg>
     </bean>
+
+    <bean id="ui" class="uk.co.grahamcox.mud.server.telnet.ui.UI" scope="connection">
+        <constructor-arg name="channel" ref="channel" />
+        <constructor-arg name="optionManager" ref="optionManager" />
+    </bean>
+
+    <util:list id="channelHandlers" scope="connection">
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.LoggingChannelHandler" scope="connection" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" scope="connection" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageEncoder" scope="connection" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler" scope="connection">
+            <constructor-arg name="optionManager" ref="optionManager" />
+        </bean>
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.DiscardHandler" scope="connection">
+            <constructor-arg name="ui" ref="ui" />
+        </bean>
+    </util:list>
 </beans>

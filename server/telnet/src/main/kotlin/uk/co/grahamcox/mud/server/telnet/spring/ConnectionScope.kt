@@ -47,6 +47,16 @@ class ConnectionScope : Scope {
      */
     fun clearActiveConnection() = activeConnections.remove()
 
+    /**
+     * Unregister a connection completely, forgetting all of the registered beans for it
+     * @param connection The connection to unregister
+     */
+    fun unregisterConnection(connection: Channel) {
+        LOG.debug("Unregistering conncetion {}", connection)
+        clearActiveConnection()
+        scopeContentsMap.remove(connection)
+    }
+
     override fun resolveContextualObject(key: String): Any? = null
 
     override fun remove(key: String): Any? = this.getScopeContents().remove(key)

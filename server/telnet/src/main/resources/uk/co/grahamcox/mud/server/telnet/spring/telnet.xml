@@ -41,6 +41,9 @@
 
     <util:list id="channelHandlers" scope="connection">
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.LoggingChannelHandler" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.ConnectionScopeHandler">
+            <constructor-arg name="connectionScope" ref="connectionScope" />
+        </bean>
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" />
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageEncoder" />
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler">

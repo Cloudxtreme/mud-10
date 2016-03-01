@@ -27,6 +27,7 @@ class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
 
 /**
  * Channel Initializer for the MUD
+ * @param connectionScope The connection scope, to make active as we register a new channel
  */
 class MudServerInitializer(private val connectionScope: ConnectionScope) :
         ChannelInitializer<SocketChannel>(), ApplicationContextAware {
@@ -34,8 +35,13 @@ class MudServerInitializer(private val connectionScope: ConnectionScope) :
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(MudServerInitializer::class.java)
 
+    /** The actual Spring Application Context */
     private lateinit var springApplicationContext: ApplicationContext
 
+    /**
+     * Set the Application Context so that we can get the Channel Handlers at channel registration time
+     * @param applicationContext The application context to use
+     */
     override fun setApplicationContext(applicationContext: ApplicationContext) {
         this.springApplicationContext = applicationContext
     }

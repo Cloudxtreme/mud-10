@@ -40,13 +40,13 @@
     </bean>
 
     <util:list id="channelHandlers" scope="connection">
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.LoggingChannelHandler" scope="connection" />
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" scope="connection" />
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageEncoder" scope="connection" />
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler" scope="connection">
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.LoggingChannelHandler" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageEncoder" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler">
             <constructor-arg name="optionManager" ref="optionManager" />
         </bean>
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.DiscardHandler" scope="connection">
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.DiscardHandler">
             <constructor-arg name="ui" ref="ui" />
         </bean>
     </util:list>

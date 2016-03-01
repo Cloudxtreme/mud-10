@@ -58,7 +58,6 @@ class ConnectionScope : Scope {
     override fun getConversationId(): String = getActiveConnection().toString()
 
     override fun get(key: String, objectFactory: ObjectFactory<*>): Any? = when (key) {
-        "connectionScope" -> this
         "channel" -> getActiveConnection()
         else -> getScopeContents().getOrPut(key) {
             objectFactory.`object`

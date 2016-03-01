@@ -6,9 +6,9 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.socket.SocketChannel
 import io.netty.util.ReferenceCountUtil
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.BeanFactory
-import org.springframework.beans.factory.BeanFactoryAware
-import uk.co.grahamcox.mud.server.telnet.options.*
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
+import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.spring.ConnectionScope
 import uk.co.grahamcox.mud.server.telnet.ui.UI
 
@@ -27,14 +27,16 @@ class DiscardHandler(private val ui: UI) : ChannelInboundHandlerAdapter() {
 /**
  * Channel Initializer for the MUD
  */
-class MudServerInitializer : ChannelInitializer<SocketChannel>(), BeanFactoryAware {
+class MudServerInitializer(private val connectionScope: ConnectionScope) : 
+        ChannelInitializer<SocketChannel>(), ApplicationContextAware {
+    
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(MudServerInitializer::class.java)
 
-    private lateinit var springBeanFactory: BeanFactory
+    private lateinit var springApplicationContext: ApplicationContext
 
-    override fun setBeanFactory(beanFactory: BeanFactory) {
-        this.springBeanFactory = beanFactory
+    override fun setApplicationContext(applicationContext: ApplicationContext) {
+        this.springApplicationContext = applicationContext
     }
 
     /**
@@ -43,11 +45,9 @@ class MudServerInitializer : ChannelInitializer<SocketChannel>(), BeanFactoryAwa
      */
     override fun initChannel(channel: SocketChannel) {
         LOG.info("Received a new connection from {}", channel)
-
-        val connectionScope = springBeanFactory.getBean("connectionScope", ConnectionScope::class.java)
         connectionScope.setActiveConnection(channel)
 
-        val optionManager = springBeanFactory.getBean(OptionManager::class.java)
+        val optionManager = springApplicationContext.getBean(OptionManager::class.java)
 
         val ui = UI(optionManager, channel)
 

@@ -59,7 +59,7 @@ class UI(private val optionManager: OptionManager,
     private fun updateRenderer() {
         this.renderer = rendererFactories.filter { factory -> factory.canCreateRenderer(rendererConfig) }
             .firstOrNull()
-            ?.createRenderer(rendererConfig) ?: SimpleRenderer(channel)
+            ?.createRenderer(channel, rendererConfig) ?: SimpleRenderer(channel)
         LOG.debug("Updated renderer to {}", renderer)
         renderer.render()
     }

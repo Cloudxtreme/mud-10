@@ -1,5 +1,6 @@
 package uk.co.grahamcox.mud.server.telnet.ui
 
+import io.netty.channel.socket.SocketChannel
 import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 
 /**
@@ -26,10 +27,11 @@ data class RendererConfig(val windowSize: NAWSOption.WindowSizePayload?,
 interface RendererFactory {
     /**
      * Actually create a renderer using the given configuration
+     * @param channel The channel to render to
      * @param config The config to check
      * @return the renderer
      */
-    fun createRenderer(config: RendererConfig): Renderer
+    fun createRenderer(channel: SocketChannel, config: RendererConfig): Renderer
 
     /**
      * Determine if this factory can create a renderer using the given config

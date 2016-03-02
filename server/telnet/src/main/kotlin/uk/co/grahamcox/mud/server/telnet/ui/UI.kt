@@ -2,7 +2,6 @@ package uk.co.grahamcox.mud.server.telnet.ui
 
 import io.netty.channel.socket.SocketChannel
 import org.slf4j.LoggerFactory
-import uk.co.grahamcox.mud.server.telnet.TelnetMessage
 import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
@@ -11,8 +10,11 @@ import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
  * The actual entrypoint for the user interface
  * @param optionManager The option manager to listen to options from
  * @param channel The channel to send messages to
+ * @param rendererFactories The renderer factories to work through
  */
-class UI(private val optionManager: OptionManager, private val channel: SocketChannel) {
+class UI(private val optionManager: OptionManager,
+         private val channel: SocketChannel,
+         private val rendererFactories: List<RendererFactory>) {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(UI::class.java)
 
@@ -25,19 +27,20 @@ class UI(private val optionManager: OptionManager, private val channel: SocketCh
         }
     }
 
-    /** The size of the window as we currently know it */
-    private var windowSize: NAWSOption.WindowSizePayload? = null
+    /** The renderer configuration as we currently know it */
+    private var rendererConfig: RendererConfig = RendererConfig(windowSize = null, terminalType = null)
 
-    /** The terminal type as we currently know it */
-    private var terminalType: String? = null
+    /** The renderer to use */
+    private var renderer: Renderer = SimpleRenderer(channel)
 
     /**
      * Handle the fact that the size of the window has changed
      * @param windowSize The new window size
      */
     private fun windowSizeChanged(windowSize: NAWSOption.WindowSizePayload) {
-        this.windowSize = windowSize
-        renderUI()
+        rendererConfig = RendererConfig(windowSize = windowSize,
+                terminalType = this.rendererConfig.terminalType)
+        updateRenderer()
     }
 
     /**
@@ -45,32 +48,19 @@ class UI(private val optionManager: OptionManager, private val channel: SocketCh
      * @param terminalType The terminal type
      */
     private fun terminalTypeChanged(terminalType: String) {
-        this.terminalType = terminalType
-        renderUI()
+        rendererConfig = RendererConfig(windowSize = this.rendererConfig.windowSize,
+                terminalType = terminalType)
+        updateRenderer()
     }
 
     /**
-     * Actually render the UI as it currently is
+     * Update the renderer to match the config we now have
      */
-    private fun renderUI() {
-        val ESC: Char = 27.toByte().toChar()
-        "${ESC}[2J".toByteArray()
-            .map { b -> TelnetMessage.ByteMessage(b) }
-            .forEach { m -> channel.write(m) }
-
-        val windowSizeMessage = "Window size is ${windowSize?.width}x${windowSize?.height}"
-        val terminalTypeMessage = "Terminal Type is ${terminalType}"
-        val messageLength = Math.max(windowSizeMessage.length, terminalTypeMessage.length)
-
-        val x = ((windowSize?.width ?: messageLength) - messageLength) / 2
-        val y = (windowSize?.height ?: 0) / 2
-
-        LOG.debug("Window size is {}", windowSize)
-        LOG.debug("Rendering message at {}x{}", x, y)
-
-        "${ESC}[${y};${x}H${windowSizeMessage}${ESC}[${y+1};${x}H${terminalTypeMessage}".toByteArray()
-            .map { b -> TelnetMessage.ByteMessage(b) }
-            .forEach { m -> channel.write(m) }
-        channel.flush()
+    private fun updateRenderer() {
+        this.renderer = rendererFactories.filter { factory -> factory.canCreateRenderer(rendererConfig) }
+            .firstOrNull()
+            ?.createRenderer(rendererConfig) ?: SimpleRenderer(channel)
+        LOG.debug("Updated renderer to {}", renderer)
+        renderer.render()
     }
 }

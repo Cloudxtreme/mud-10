@@ -56,6 +56,25 @@ class UI(private val optionManager: OptionManager,
                 e -> terminalTypeChanged(e.payload as String)
             }
         }
+
+        class ExpiredOptionsHandler : TimerTask() {
+            override fun run() {
+                LOG.debug("Handling when options haven't been set yet. Window Size = {}, Terminal Type = {}",
+                        windowSizeOptionStatus,
+                        terminalTypeOptionStatus)
+                if (windowSizeOptionStatus == OptionStatus.UNKNOWN) {
+                    windowSizeOptionStatus = OptionStatus.EXPIRED
+                    windowSize = null
+                }
+                if (terminalTypeOptionStatus == OptionStatus.UNKNOWN) {
+                    terminalTypeOptionStatus = OptionStatus.EXPIRED
+                    terminalType = null
+                }
+                handleOptionChanges()
+            }
+        }
+
+        Timer().schedule(ExpiredOptionsHandler(), 5000)
     }
 
     /** The status of the Window Size option */

@@ -37,11 +37,6 @@
     <bean id="ui" class="uk.co.grahamcox.mud.server.telnet.ui.UI" scope="connection">
         <constructor-arg name="channel" ref="channel" />
         <constructor-arg name="optionManager" ref="optionManager" />
-        <constructor-arg name="rendererFactories">
-            <list>
-                <bean class="uk.co.grahamcox.mud.server.telnet.ui.FullAnsiRendererFactory" />
-            </list>
-        </constructor-arg>
     </bean>
 
     <util:list id="channelHandlers" scope="connection">

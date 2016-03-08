@@ -13,8 +13,7 @@ import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
  * @param rendererFactories The renderer factories to work through
  */
 class UI(private val optionManager: OptionManager,
-         private val channel: SocketChannel,
-         private val rendererFactories: List<RendererFactory>) {
+         private val channel: SocketChannel) {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(UI::class.java)
 
@@ -27,20 +26,11 @@ class UI(private val optionManager: OptionManager,
         }
     }
 
-    /** The renderer configuration as we currently know it */
-    private var rendererConfig: RendererConfig = RendererConfig(windowSize = null, terminalType = null)
-
-    /** The renderer to use */
-    private var renderer: Renderer = SimpleRenderer(channel)
-
     /**
      * Handle the fact that the size of the window has changed
      * @param windowSize The new window size
      */
     private fun windowSizeChanged(windowSize: NAWSOption.WindowSizePayload) {
-        rendererConfig = RendererConfig(windowSize = windowSize,
-                terminalType = this.rendererConfig.terminalType)
-        updateRenderer()
     }
 
     /**
@@ -48,19 +38,5 @@ class UI(private val optionManager: OptionManager,
      * @param terminalType The terminal type
      */
     private fun terminalTypeChanged(terminalType: String) {
-        rendererConfig = RendererConfig(windowSize = this.rendererConfig.windowSize,
-                terminalType = terminalType)
-        updateRenderer()
-    }
-
-    /**
-     * Update the renderer to match the config we now have
-     */
-    private fun updateRenderer() {
-        this.renderer = rendererFactories.filter { factory -> factory.canCreateRenderer(rendererConfig) }
-            .firstOrNull()
-            ?.createRenderer(channel, rendererConfig) ?: SimpleRenderer(channel)
-        LOG.debug("Updated renderer to {}", renderer)
-        renderer.render()
     }
 }

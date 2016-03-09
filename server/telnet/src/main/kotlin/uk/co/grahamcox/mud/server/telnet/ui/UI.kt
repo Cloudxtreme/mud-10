@@ -2,6 +2,7 @@ package uk.co.grahamcox.mud.server.telnet.ui
 
 import io.netty.channel.socket.SocketChannel
 import org.slf4j.LoggerFactory
+import uk.co.grahamcox.mud.server.telnet.TelnetMessage
 import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.TelnetOption
@@ -10,131 +11,56 @@ import java.util.*
 
 /**
  * The actual entrypoint for the user interface
- * @param optionManager The option manager to listen to options from
+ * @param configOptionList The list of UI Config Options to work with
  * @param channel The channel to send messages to
- * @param rendererFactories The renderer factories to work through
  */
-class UI(private val optionManager: OptionManager,
+class UI(val configOptionList: List<UIConfigOption>,
          private val channel: SocketChannel) {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(UI::class.java)
 
-    /**
-     * Enumeration of the status of a Telnet option that we care about
-     */
-    enum class OptionStatus {
-        /** We don't yet know the status */
+    /** Collection of the Option Statuses that we consider to be terminals. I.e. we now know what we're doing with this option */
+    private val TERMINAL_OPTION_STATUSES = EnumSet.of(UIConfigOption.OptionStatus.DISABLED,
+            UIConfigOption.OptionStatus.CONFIGURED)
+
+    /** Map of the configuration options that we are using */
+    private val configOptions = configOptionList.map { option -> option.javaClass to option }
+            .toMap()
+
+    /** Enumeration of the possible configuration statuses */
+    private enum class ConfigurationStatus {
+        /** We're not yet configured */
         UNKNOWN,
-        /** The option is disabled */
-        DISABLED,
-        /** The option expired before we got a response */
-        EXPIRED,
-        /** The option is enabled */
-        ENABLED,
-        /** The option is fully configured */
+        /** We've timed out waiting for configuration */
+        TIMED_OUT,
+        /** We're fully configured */
         CONFIGURED
     }
 
-    /** Collection of the Option Statuses that we consider to be terminals. I.e. we now know what we're doing with this option */
-    private val TERMINAL_OPTION_STATUSES = EnumSet.of(OptionStatus.DISABLED, OptionStatus.CONFIGURED, OptionStatus.EXPIRED)
+    /** The current configuration status */
+    private var configurationStatus = ConfigurationStatus.UNKNOWN
+        set(value) {
+            // We can only change from UNKNOWN to a value
+            if (field == ConfigurationStatus.UNKNOWN) {
+                field = value
+                selectRenderer()
+            }
+        }
 
     init {
-        with(optionManager.getServerOption(NAWSOption::class.java).eventManager) {
-            registerListener(TelnetOption.STATE_CHANGED_EVENT) {
-                e -> windowSizeStatusChanged(e.payload as TelnetOption.OptionState)
-            }
-            registerListener(NAWSOption.WINDOW_SIZE_CHANGED_EVENT) {
-                e -> windowSizeChanged(e.payload as NAWSOption.WindowSizePayload)
+        configOptions.values.forEach { option ->
+            option.eventManager.registerListener(UIConfigOption.STATUS_CHANGED_EVENT) {
+                this.handleOptionChanges()
             }
         }
 
-        with(optionManager.getServerOption(TerminalTypeOption::class.java).eventManager) {
-            registerListener(TelnetOption.STATE_CHANGED_EVENT) {
-                e -> terminalTypeStatusChanged(e.payload as TelnetOption.OptionState)
-            }
-            registerListener(TerminalTypeOption.TERMINAL_TYPE_CHANGED_EVENT) {
-                e -> terminalTypeChanged(e.payload as String)
-            }
-        }
-
-        class ExpiredOptionsHandler : TimerTask() {
+        class TimedOutTask : TimerTask() {
             override fun run() {
-                LOG.debug("Handling when options haven't been set yet. Window Size = {}, Terminal Type = {}",
-                        windowSizeOptionStatus,
-                        terminalTypeOptionStatus)
-                if (windowSizeOptionStatus == OptionStatus.UNKNOWN) {
-                    windowSizeOptionStatus = OptionStatus.EXPIRED
-                    windowSize = null
-                }
-                if (terminalTypeOptionStatus == OptionStatus.UNKNOWN) {
-                    terminalTypeOptionStatus = OptionStatus.EXPIRED
-                    terminalType = null
-                }
-                handleOptionChanges()
+                configurationStatus = ConfigurationStatus.TIMED_OUT
             }
         }
 
-        Timer().schedule(ExpiredOptionsHandler(), 5000)
-    }
-
-    /** The status of the Window Size option */
-    private var windowSizeOptionStatus: OptionStatus = OptionStatus.UNKNOWN
-
-    /** The actual Window Size to use */
-    private var windowSize: NAWSOption.WindowSizePayload? = null
-
-    /** The status of the Terminal Type option */
-    private var terminalTypeOptionStatus: OptionStatus = OptionStatus.UNKNOWN
-
-    /** The actual Terminal Type to use */
-    private var terminalType: String? = null
-
-    /**
-     * Handle the fact that the status of the Window Size option has changed
-     * @param newStatus The new status of the Window Size option
-     */
-    private fun windowSizeStatusChanged(newStatus: TelnetOption.OptionState) {
-        windowSizeOptionStatus = when (newStatus) {
-            TelnetOption.OptionState.DISABLED -> OptionStatus.DISABLED
-            TelnetOption.OptionState.ENABLED -> OptionStatus.ENABLED
-            TelnetOption.OptionState.UNKNOWN -> OptionStatus.UNKNOWN
-        }
-        windowSize = null
-        handleOptionChanges()
-    }
-
-    /**
-     * Handle the fact that the size of the window has changed
-     * @param windowSize The new window size
-     */
-    private fun windowSizeChanged(windowSize: NAWSOption.WindowSizePayload) {
-        windowSizeOptionStatus = OptionStatus.CONFIGURED
-        this.windowSize = windowSize
-        handleOptionChanges()
-    }
-
-    /**
-     * Handle the fact that the status of the Terminal Type option has changed
-     * @param newStatus The new status of the Terminal Type option
-     */
-    private fun terminalTypeStatusChanged(newStatus: TelnetOption.OptionState) {
-        terminalTypeOptionStatus = when (newStatus) {
-            TelnetOption.OptionState.DISABLED -> OptionStatus.DISABLED
-            TelnetOption.OptionState.ENABLED -> OptionStatus.ENABLED
-            TelnetOption.OptionState.UNKNOWN -> OptionStatus.UNKNOWN
-        }
-        terminalType = null
-        handleOptionChanges()
-    }
-
-    /**
-     * Handle the fact that the terminal type has changed
-     * @param terminalType The terminal type
-     */
-    private fun terminalTypeChanged(terminalType: String) {
-        terminalTypeOptionStatus = OptionStatus.CONFIGURED
-        this.terminalType = terminalType
-        handleOptionChanges()
+        Timer().schedule(TimedOutTask(), 5000)
     }
 
     /**
@@ -143,13 +69,23 @@ class UI(private val optionManager: OptionManager,
      * and so we can get on with the processing of the game
      */
     private fun handleOptionChanges() {
-        LOG.debug("Window Size Status: {}", windowSizeOptionStatus)
-        LOG.debug("Window Size: {}", windowSize)
-        LOG.debug("Terminal Type Status: {}", terminalTypeOptionStatus)
-        LOG.debug("Terminal Type: {}", terminalType)
+        val unconfigured = configOptions.map { entry -> entry.key to entry.value.optionStatus }
+            .filter { entry -> !TERMINAL_OPTION_STATUSES.contains(entry.second) }
+        LOG.debug("Unconfigured UI Options: {}", unconfigured)
 
-        if (TERMINAL_OPTION_STATUSES.contains(windowSizeOptionStatus) && TERMINAL_OPTION_STATUSES.contains(terminalTypeOptionStatus)) {
-            LOG.debug("Received full configuration of session")
+        if (unconfigured.isEmpty()) {
+            configurationStatus = ConfigurationStatus.CONFIGURED
         }
+    }
+
+    /**
+     * Select a renderer to use for this session, now that we have enough information to do so
+     */
+    private fun selectRenderer() {
+        LOG.debug("Received full configuration of session: {}", configurationStatus)
+        "Received full configuration of session: ${configurationStatus}\r\n".toByteArray()
+            .map { b -> TelnetMessage.ByteMessage(b) }
+            .forEach { msg -> channel.write(msg) }
+        channel.flush()
     }
 }

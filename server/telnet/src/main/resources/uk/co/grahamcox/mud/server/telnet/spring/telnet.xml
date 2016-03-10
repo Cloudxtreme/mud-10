@@ -50,7 +50,9 @@
             <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.CompositeRendererFactory">
                 <constructor-arg name="delegates">
                     <list>
-
+                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory">
+                            <constructor-arg name="channel" ref="channel" />
+                        </bean>
                     </list>
                 </constructor-arg>
             </bean>

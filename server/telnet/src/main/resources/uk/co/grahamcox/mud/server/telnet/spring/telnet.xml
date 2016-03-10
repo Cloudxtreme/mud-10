@@ -46,6 +46,15 @@
                 </bean>
             </list>
         </constructor-arg>
+        <constructor-arg name="rendererFactory">
+            <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.CompositeRendererFactory">
+                <constructor-arg name="delegates">
+                    <list>
+
+                    </list>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
     </bean>
 
     <util:list id="channelHandlers" scope="connection">

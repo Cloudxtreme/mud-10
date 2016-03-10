@@ -12,7 +12,7 @@ interface RendererFactory {
      * @param configOptions The configuration options that we have determined to use
      * @return the renderer to use. If this factory can't produce a renderer then return null instead
      */
-    fun createRenderer(configOptions: Map<Class<*>, UIConfigOption>): Renderer?
+    fun createRenderer(configOptions: Map<Class<UIConfigOption>, UIConfigOption>): Renderer?
 }
 
 /**
@@ -26,7 +26,7 @@ class CompositeRendererFactory(private val delegates: List<RendererFactory>) : R
     /**
      * Work through the list of Renderer Factories that we have until one succeeds
      */
-    override fun createRenderer(configOptions: Map<Class<*>, UIConfigOption>): Renderer? =
+    override fun createRenderer(configOptions: Map<Class<UIConfigOption>, UIConfigOption>): Renderer? =
         delegates.asSequence()
             .map { factory ->
                 LOG.debug("Attempting to create a renderer with factory {} and options {}", factory, configOptions)

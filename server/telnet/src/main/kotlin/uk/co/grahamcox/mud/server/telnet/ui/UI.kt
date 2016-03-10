@@ -7,14 +7,17 @@ import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.TelnetOption
 import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
+import uk.co.grahamcox.mud.server.telnet.ui.renderer.RendererFactory
 import java.util.*
 
 /**
  * The actual entrypoint for the user interface
  * @param configOptionList The list of UI Config Options to work with
+ * @param rendererFactory The mechanism to build a renderer to use
  * @param channel The channel to send messages to
  */
 class UI(val configOptionList: List<UIConfigOption>,
+         private val rendererFactory: RendererFactory,
          private val channel: SocketChannel) {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(UI::class.java)
@@ -82,10 +85,15 @@ class UI(val configOptionList: List<UIConfigOption>,
      * Select a renderer to use for this session, now that we have enough information to do so
      */
     private fun selectRenderer() {
-        LOG.debug("Received full configuration of session: {}", configurationStatus)
-        "Received full configuration of session: ${configurationStatus}\r\n".toByteArray()
-            .map { b -> TelnetMessage.ByteMessage(b) }
-            .forEach { msg -> channel.write(msg) }
-        channel.flush()
+        LOG.debug("Received full configuration of session: {}, {}", configurationStatus, configOptions)
+
+        val renderer = rendererFactory.createRenderer(configOptions)
+        if (renderer == null) {
+            "No suitable renderer found. Disconnecting\r\n".toByteArray()
+                .map { TelnetMessage.ByteMessage(it) }
+                .forEach { channel.write(it) }
+            channel.flush()
+            channel.close()
+        }
     }
 }

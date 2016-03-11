@@ -15,7 +15,7 @@ class CompositeRendererFactoryTest : EasyMockSupport() {
      */
     @Test
     fun firstWorks() {
-        val configOptions = mapOf<Class<*>, UIConfigOption>()
+        val configOptions = mapOf<Class<UIConfigOption>, UIConfigOption>()
         val delegates = arrayListOf<RendererFactory>()
         val renderer = createMock(Renderer::class.java)
 
@@ -39,7 +39,7 @@ class CompositeRendererFactoryTest : EasyMockSupport() {
      */
     @Test
     fun thirdWorks() {
-        val configOptions = mapOf<Class<*>, UIConfigOption>()
+        val configOptions = mapOf<Class<UIConfigOption>, UIConfigOption>()
         val delegates = arrayListOf<RendererFactory>()
         val renderer = createMock(Renderer::class.java)
 
@@ -67,7 +67,7 @@ class CompositeRendererFactoryTest : EasyMockSupport() {
      */
     @Test
     fun noneWork() {
-        val configOptions = mapOf<Class<*>, UIConfigOption>()
+        val configOptions = mapOf<Class<UIConfigOption>, UIConfigOption>()
         val delegates = arrayListOf<RendererFactory>()
 
         for (i in 0..10) {

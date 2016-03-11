@@ -10,9 +10,7 @@ import uk.co.grahamcox.mud.server.telnet.ui.renderer.Renderer
  */
 class StandardRenderer(private val channel: SocketChannel) : Renderer {
     init {
-        "Welcome\r\n".toByteArray()
-            .map { TelnetMessage.ByteMessage(it) }
-            .forEach { channel.write(it) }
+        channel.write("Welcome\r\n")
         channel.flush()
     }
 }

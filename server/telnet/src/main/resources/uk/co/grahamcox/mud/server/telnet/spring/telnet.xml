@@ -18,17 +18,29 @@
 
     <bean id="optionManager" class="uk.co.grahamcox.mud.server.telnet.options.OptionManager" scope="connection">
         <constructor-arg name="clientOptions">
-            <list>
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.EchoOption" scope="connection" />
-            </list>
+            <map>
+                <entry value="DISABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.EchoOption" scope="connection" />
+                    </key>
+                </entry>
+            </map>
         </constructor-arg>
         <constructor-arg name="serverOptions">
-            <list>
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.NAWSOption" scope="connection" />
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption" scope="connection">
-                    <constructor-arg name="channel" ref="channel" />
-                </bean>
-            </list>
+            <map>
+                <entry value="ENABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.NAWSOption" scope="connection" />
+                    </key>
+                </entry>
+                <entry value="ENABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption" scope="connection">
+                            <constructor-arg name="channel" ref="channel" />
+                        </bean>
+                    </key>
+                </entry>
+            </map>
         </constructor-arg>
     </bean>
 

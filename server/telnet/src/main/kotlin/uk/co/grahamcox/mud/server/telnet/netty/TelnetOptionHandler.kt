@@ -19,8 +19,14 @@ class TelnetOptionHandler(private val optionManager : OptionManager) : ChannelIn
      */
     override fun channelRegistered(ctx: ChannelHandlerContext) {
         super.channelRegistered(ctx)
-        optionManager.serverOptions.forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.DO) }
-        optionManager.clientOptions.forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.WILL) }
+        optionManager.serverOptions
+                .filter { option -> option.value == OptionManager.InitialStatus.ENABLED}
+                .map { option -> option.key }
+                .forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.DO) }
+        optionManager.clientOptions
+                .filter { option -> option.value == OptionManager.InitialStatus.ENABLED}
+                .map { option -> option.key }
+                .forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.WILL) }
         ctx.flush()
     }
 

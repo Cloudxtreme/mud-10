@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="standardRendererFactory"
+          class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory"
+          scope="connection" />
+
+    <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialState" scope="prototype">
+        <constructor-arg name="channel" ref="channel" />
+    </bean>
+</beans>

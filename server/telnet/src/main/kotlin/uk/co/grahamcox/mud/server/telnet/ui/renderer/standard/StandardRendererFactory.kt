@@ -8,16 +8,14 @@ import uk.co.grahamcox.mud.server.telnet.ui.renderer.RendererFactory
 
 /**
  * Factory to produce the standard renderer
- * @property channel The channel to use for the renderer
- * @property optionManager The option manager to get the connection options from
+ * @property renderers The map of renderer state factories to use
  */
-class StandardRendererFactory(private val channel: SocketChannel,
-                              private val optionManager: OptionManager) : RendererFactory {
+class StandardRendererFactory(private val renderers: Map<String, RendererStateFactory>) : RendererFactory {
     /**
      * Create the standard renderer
      * @param configOptions The configuration options for the renderer
      * @return the renderer
      */
     override fun createRenderer(configOptions: Map<Class<UIConfigOption>, UIConfigOption>): Renderer? =
-            StandardRenderer(channel)
+            StandardRenderer(renderers)
 }

@@ -61,8 +61,15 @@
                 <constructor-arg name="delegates">
                     <list>
                         <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory">
-                            <constructor-arg name="channel" ref="channel" />
-                            <constructor-arg name="optionManager" ref="optionManager" />
+                            <constructor-arg name="renderers">
+                                <map>
+                                    <entry key="initial">
+                                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialStateFactory">
+                                            <constructor-arg name="channel" ref="channel" />
+                                        </bean>
+                                    </entry>
+                                </map>
+                            </constructor-arg>
                         </bean>
                     </list>
                 </constructor-arg>

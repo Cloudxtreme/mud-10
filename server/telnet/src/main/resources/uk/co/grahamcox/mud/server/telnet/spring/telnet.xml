@@ -60,21 +60,15 @@
             <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.CompositeRendererFactory">
                 <constructor-arg name="delegates">
                     <list>
-                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory">
-                            <constructor-arg name="renderers">
-                                <map>
-                                    <entry key="initial">
-                                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialStateFactory">
-                                            <constructor-arg name="channel" ref="channel" />
-                                        </bean>
-                                    </entry>
-                                </map>
-                            </constructor-arg>
-                        </bean>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory" />
                     </list>
                 </constructor-arg>
             </bean>
         </constructor-arg>
+    </bean>
+
+    <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialState" scope="prototype">
+        <constructor-arg name="channel" ref="channel" />
     </bean>
 
     <util:list id="channelHandlers" scope="connection">

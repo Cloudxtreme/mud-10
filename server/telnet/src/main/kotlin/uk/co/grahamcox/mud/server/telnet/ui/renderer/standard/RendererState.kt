@@ -5,16 +5,11 @@ package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
  * Note that the renderer can only ever be in a single state.
  */
 interface RendererState {
-
 }
 
 /**
- * Factory to use to generate a new state for the renderer
+ * Annotation that must be applied to the state class to indicate the name of the state
  */
-interface RendererStateFactory {
-    /**
-     * Create a new instance of the appropriate state
-     * @return the new instance of the state
-     */
-    fun create() : RendererState
-}
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class StateName(val value: String)

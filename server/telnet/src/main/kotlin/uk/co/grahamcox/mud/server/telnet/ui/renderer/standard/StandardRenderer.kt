@@ -7,8 +7,10 @@ import uk.co.grahamcox.mud.server.telnet.ui.renderer.Renderer
 /**
  * The standard renderer
  * @property renderers The map of renderers factories to use
+ * @property stateChanger The state changer to listen to
  */
-class StandardRenderer(private val applicationContext: ApplicationContext) : Renderer {
+class StandardRenderer(private val applicationContext: ApplicationContext,
+                       private val stateChanger: StateChanger) : Renderer {
     /** The logger to use */
     private val LOG = LoggerFactory.getLogger(StandardRenderer::class.java)
 
@@ -29,7 +31,17 @@ class StandardRenderer(private val applicationContext: ApplicationContext) : Ren
 
         LOG.debug("Initialised state bean mappings: {}", stateBeanNames)
 
-        state = createState("initial")
+        stateChanger.registerStateChangeListener { newState -> this.changeState(newState) }
+
+        changeState("initial")
+    }
+
+    /**
+     * Actually change the state that we are in
+     * @param newState The new state to change into
+     */
+    private fun changeState(newState: String) {
+        state = createState(newState)
     }
 
     /**

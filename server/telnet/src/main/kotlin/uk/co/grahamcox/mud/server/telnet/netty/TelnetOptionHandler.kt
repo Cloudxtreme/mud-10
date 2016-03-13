@@ -22,10 +22,12 @@ class TelnetOptionHandler(private val optionManager : OptionManager) : ChannelIn
         optionManager.serverOptions
                 .filter { option -> option.value == OptionManager.InitialStatus.ENABLED}
                 .map { option -> option.key }
+                .sortedBy { option -> option.optionId }
                 .forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.DO) }
         optionManager.clientOptions
                 .filter { option -> option.value == OptionManager.InitialStatus.ENABLED}
                 .map { option -> option.key }
+                .sortedBy { option -> option.optionId }
                 .forEach { option -> negotationOption(ctx, option, TelnetMessage.NegotiationMessage.Negotiation.WILL) }
         ctx.flush()
     }

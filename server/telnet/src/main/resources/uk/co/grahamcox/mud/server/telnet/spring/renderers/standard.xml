@@ -17,4 +17,8 @@
         <constructor-arg name="channel" ref="channel" />
         <constructor-arg name="stateChanger" ref="stateChanger" />
     </bean>
+
+    <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.LoginState" scope="prototype">
+        <constructor-arg name="channel" ref="channel" />
+    </bean>
 </beans>

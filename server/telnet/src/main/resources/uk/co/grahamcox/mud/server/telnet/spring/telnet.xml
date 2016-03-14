@@ -75,7 +75,7 @@
             <constructor-arg name="optionManager" ref="optionManager" />
         </bean>
 
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.DiscardHandler">
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.MudServerHandler">
             <constructor-arg name="ui" ref="ui" />
         </bean>
     </util:list>

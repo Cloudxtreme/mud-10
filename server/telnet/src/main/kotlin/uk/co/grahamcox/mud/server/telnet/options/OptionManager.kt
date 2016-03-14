@@ -5,16 +5,23 @@ package uk.co.grahamcox.mud.server.telnet.options
  * @property clientOptions The list of all options that we want to support that are requested by the client
  * @property serverOptions The list of all options that we want to support that are requested by the server
  */
-class OptionManager(val clientOptions: List<TelnetOption>, val serverOptions: List<TelnetOption>) {
+class OptionManager(val clientOptions: Map<TelnetOption, InitialStatus>,
+                    val serverOptions: Map<TelnetOption, InitialStatus>) {
+    /** Enumeration of the initial status to request for the options */
+    enum class InitialStatus {
+        ENABLED,
+        DISABLED
+    }
+
     /** The map of Client Options, so that we can look them up by ID */
-    private val clientOptionsIdMap = clientOptions.map { option -> option.optionId to option }.toMap()
+    private val clientOptionsIdMap = clientOptions.keys.map { option -> option.optionId to option }.toMap()
     /** The map of Server Options, os that we can look them up by ID */
-    private val serverOptionsIdMap = serverOptions.map { option -> option.optionId to option }.toMap()
+    private val serverOptionsIdMap = serverOptions.keys.map { option -> option.optionId to option }.toMap()
 
     /** The map of Client Options, so that we can look them up by type */
-    private val clientOptionsMap = clientOptions.map { option -> option.javaClass to option }.toMap()
+    private val clientOptionsMap = clientOptions.keys.map { option -> option.javaClass to option }.toMap()
     /** The map of Server Options, so that we can look them up by type */
-    private val serverOptionsMap = serverOptions.map { option -> option.javaClass to option }.toMap()
+    private val serverOptionsMap = serverOptions.keys.map { option -> option.javaClass to option }.toMap()
 
     /**
      * Get the Client Option that has the given Option ID. If none is known then null is returned

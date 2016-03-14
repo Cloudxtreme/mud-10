@@ -18,19 +18,29 @@
 
     <bean id="optionManager" class="uk.co.grahamcox.mud.server.telnet.options.OptionManager" scope="connection">
         <constructor-arg name="clientOptions">
-            <list>
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.SuppressGoAheadOption" scope="connection" />
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.EchoOption" scope="connection" />
-            </list>
+            <map>
+                <entry value="DISABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.EchoOption" scope="connection" />
+                    </key>
+                </entry>
+            </map>
         </constructor-arg>
         <constructor-arg name="serverOptions">
-            <list>
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.SuppressGoAheadOption" scope="connection" />
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.NAWSOption" scope="connection" />
-                <bean class="uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption" scope="connection">
-                    <constructor-arg name="channel" ref="channel" />
-                </bean>
-            </list>
+            <map>
+                <entry value="ENABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.NAWSOption" scope="connection" />
+                    </key>
+                </entry>
+                <entry value="ENABLED">
+                    <key>
+                        <bean class="uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption" scope="connection">
+                            <constructor-arg name="channel" ref="channel" />
+                        </bean>
+                    </key>
+                </entry>
+            </map>
         </constructor-arg>
     </bean>
 
@@ -46,17 +56,7 @@
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg name="rendererFactory">
-            <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.CompositeRendererFactory">
-                <constructor-arg name="delegates">
-                    <list>
-                        <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.StandardRendererFactory">
-                            <constructor-arg name="channel" ref="channel" />
-                        </bean>
-                    </list>
-                </constructor-arg>
-            </bean>
-        </constructor-arg>
+        <constructor-arg name="rendererFactory" ref="rendererFactory" />
     </bean>
 
     <util:list id="channelHandlers" scope="connection">
@@ -64,13 +64,21 @@
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.ConnectionScopeHandler">
             <constructor-arg name="connectionScope" ref="connectionScope" />
         </bean>
-        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" />
+
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageEncoder" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.ByteOutboundHandlerAdapter" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.ByteArrayOutboundHandlerAdapter" />
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.StringOutboundHandlerAdapter" />
+
+        <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetMessageDecoder" />
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.TelnetOptionHandler">
             <constructor-arg name="optionManager" ref="optionManager" />
         </bean>
+
         <bean class="uk.co.grahamcox.mud.server.telnet.netty.DiscardHandler">
             <constructor-arg name="ui" ref="ui" />
         </bean>
     </util:list>
+
+    <import resource="renderers/renderers.xml" />
 </beans>

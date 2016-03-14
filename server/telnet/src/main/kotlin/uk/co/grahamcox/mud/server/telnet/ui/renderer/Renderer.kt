@@ -5,4 +5,9 @@ package uk.co.grahamcox.mud.server.telnet.ui.renderer
  */
 interface Renderer {
 
+    /**
+     * Handle when we've received an actual byte from the client
+     * @param byte The byte that was received
+     */
+    fun receiveByte(byte: Byte)
 }

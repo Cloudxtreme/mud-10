@@ -7,6 +7,7 @@ import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.TelnetOption
 import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
+import uk.co.grahamcox.mud.server.telnet.ui.renderer.Renderer
 import uk.co.grahamcox.mud.server.telnet.ui.renderer.RendererFactory
 import java.util.*
 
@@ -25,28 +26,6 @@ class UI(val configOptionList: List<UIConfigOption>,
     /** Collection of the Option Statuses that we consider to be terminals. I.e. we now know what we're doing with this option */
     private val TERMINAL_OPTION_STATUSES = EnumSet.of(UIConfigOption.OptionStatus.DISABLED,
             UIConfigOption.OptionStatus.CONFIGURED)
-
-    /** The byte that represents a Carriage Return */
-    private val CR_BYTE = 0x0d.toByte()
-
-    /** The byte that represents a Line Feed */
-    private val LF_BYTE = 0x0a.toByte()
-
-    /** Indication of the state that we're in as far as receiving messages */
-    private enum class State {
-        /** No special state */
-        NONE,
-        /** The last byte was a CR */
-        CR,
-        /** The last byte was an LF */
-        LF
-    }
-
-    /** The message that we've so far received */
-    private val message: MutableList<Byte> = arrayListOf()
-
-    /** The current state that we're in for receiving input */
-    private var state: State = State.NONE
 
     /** Map of the configuration options that we are using */
     private val configOptions = configOptionList.map { option -> option.javaClass to option }
@@ -72,6 +51,12 @@ class UI(val configOptionList: List<UIConfigOption>,
             }
         }
 
+    /** The renderer to use */
+    private var renderer: Renderer? = null
+
+    /** List of bytes that were received before a renderer was selected */
+    private var unhandledBytes: MutableList<Byte> = arrayListOf()
+
     init {
         configOptions.values.forEach { option ->
             option.eventManager.registerListener(UIConfigOption.STATUS_CHANGED_EVENT) {
@@ -93,47 +78,11 @@ class UI(val configOptionList: List<UIConfigOption>,
      * @param byte The byte that was received
      */
     fun receiveByte(byte: Byte) {
-        when (state) {
-            State.NONE -> {
-                when (byte) {
-                    CR_BYTE -> state = State.CR
-                    LF_BYTE -> state = State.LF
-                    else -> message.add(byte)
-                }
-            }
-            State.CR -> {
-                state = State.NONE
-                when (byte) {
-                    LF_BYTE -> {
-                        handleCommand(message)
-                        message.clear()
-                    }
-                    else -> {
-                        message.add(byte)
-                    }
-                }
-            }
-            State.LF -> {
-                state = State.NONE
-                when (byte) {
-                    CR_BYTE -> {
-                        handleCommand(message)
-                        message.clear()
-                    }
-                    else -> {
-                        message.add(byte)
-                    }
-                }
-            }
+        if (renderer == null) {
+            unhandledBytes.add(byte)
+        } else {
+            renderer?.receiveByte(byte)
         }
-    }
-
-    /**
-     * Handle a fully received command
-     * @param command The fully received command
-     */
-    private fun handleCommand(command: List<Byte>) {
-        LOG.info("Received command: {}", command)
     }
 
     /**
@@ -164,6 +113,9 @@ class UI(val configOptionList: List<UIConfigOption>,
                 .forEach { channel.write(it) }
             channel.flush()
             channel.close()
+        } else {
+            this.renderer = renderer
+            unhandledBytes.forEach { renderer.receiveByte(it) }
         }
     }
 }

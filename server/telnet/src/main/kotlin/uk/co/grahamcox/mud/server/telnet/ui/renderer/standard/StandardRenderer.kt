@@ -20,6 +20,9 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
     /** Map of the mapping between state names and Spring bean names */
     private lateinit var stateBeanNames: Map<String, String>
 
+    /** The mechanism to process received bytes */
+    private val inputHandler = InputHandler()
+
     init {
         val stateBeans = applicationContext.getBeanNamesForAnnotation(StateName::class.java)
         LOG.trace("Gathered al of the bean names that can act as states")
@@ -34,6 +37,14 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
         stateChanger.registerStateChangeListener { newState -> this.changeState(newState) }
 
         changeState("initial")
+    }
+
+    /**
+     * Handle when we've received a byte form the client
+     * @param byte the byte to handle
+     */
+    override fun receiveByte(byte: Byte) {
+        inputHandler.receiveByte(byte)
     }
 
     /**

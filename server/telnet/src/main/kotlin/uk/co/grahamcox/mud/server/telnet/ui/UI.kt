@@ -7,6 +7,7 @@ import uk.co.grahamcox.mud.server.telnet.options.NAWSOption
 import uk.co.grahamcox.mud.server.telnet.options.OptionManager
 import uk.co.grahamcox.mud.server.telnet.options.TelnetOption
 import uk.co.grahamcox.mud.server.telnet.options.TerminalTypeOption
+import uk.co.grahamcox.mud.server.telnet.spring.ConnectionScope
 import uk.co.grahamcox.mud.server.telnet.ui.renderer.Renderer
 import uk.co.grahamcox.mud.server.telnet.ui.renderer.RendererFactory
 import java.util.*
@@ -14,10 +15,12 @@ import java.util.*
 /**
  * The actual entrypoint for the user interface
  * @param configOptionList The list of UI Config Options to work with
+ * @param connectionScope The connection scope, for updating in the timeout thread
  * @param rendererFactory The mechanism to build a renderer to use
  * @param channel The channel to send messages to
  */
 class UI(val configOptionList: List<UIConfigOption>,
+         private val connectionScope: ConnectionScope,
          private val rendererFactory: RendererFactory,
          private val channel: SocketChannel) {
     /** The logger to use */
@@ -66,7 +69,12 @@ class UI(val configOptionList: List<UIConfigOption>,
 
         class TimedOutTask : TimerTask() {
             override fun run() {
-                configurationStatus = ConfigurationStatus.TIMED_OUT
+                try {
+                    connectionScope.setActiveConnection(channel)
+                    configurationStatus = ConfigurationStatus.TIMED_OUT
+                } finally {
+                    connectionScope.clearActiveConnection()
+                }
             }
         }
 

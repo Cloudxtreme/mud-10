@@ -46,6 +46,7 @@
 
     <bean id="ui" class="uk.co.grahamcox.mud.server.telnet.ui.UI" scope="connection">
         <constructor-arg name="channel" ref="channel" />
+        <constructor-arg name="connectionScope" ref="connectionScope" />
         <constructor-arg name="configOptionList">
             <list>
                 <bean class="uk.co.grahamcox.mud.server.telnet.ui.WindowSizeConfigOption">

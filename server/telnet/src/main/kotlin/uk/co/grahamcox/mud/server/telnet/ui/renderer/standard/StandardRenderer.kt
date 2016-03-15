@@ -18,7 +18,7 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
     private lateinit var state: RendererState
 
     /** Map of the mapping between state names and Spring bean names */
-    private lateinit var stateBeanNames: Map<String, String>
+    private var stateBeanNames: Map<String, String>
 
     /** The mechanism to process received bytes */
     private val inputHandler = InputHandler()
@@ -36,7 +36,7 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
 
         stateChanger.registerStateChangeListener { newState -> this.changeState(newState) }
 
-        changeState("initial")
+        stateChanger.changeState("initial")
     }
 
     /**
@@ -44,7 +44,11 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
      * @param byte the byte to handle
      */
     override fun receiveByte(byte: Byte) {
-        inputHandler.receiveByte(byte)
+        val command = inputHandler.receiveByte(byte)
+        if (command != null) {
+            LOG.trace("Received command: {}", command)
+            state.handleCommand(command)
+        }
     }
 
     /**
@@ -52,7 +56,10 @@ class StandardRenderer(private val applicationContext: ApplicationContext,
      * @param newState The new state to change into
      */
     private fun changeState(newState: String) {
+        LOG.trace("Requested to change state to {}", newState)
         state = createState(newState)
+        LOG.debug("Changed state to {}: {}", newState, state)
+        state.enterState()
     }
 
     /**

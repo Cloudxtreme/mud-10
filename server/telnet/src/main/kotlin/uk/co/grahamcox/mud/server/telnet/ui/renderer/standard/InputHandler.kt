@@ -35,7 +35,7 @@ class InputHandler {
      * Handle when we've received an actual byte from the client
      * @param byte The byte that was received
      */
-    fun receiveByte(byte: Byte) {
+    fun receiveByte(byte: Byte): String? =
         when (state) {
             State.NONE -> {
                 when (byte) {
@@ -43,16 +43,19 @@ class InputHandler {
                     LF_BYTE -> state = State.LF
                     else -> message.add(byte)
                 }
+                null
             }
             State.CR -> {
                 state = State.NONE
                 when (byte) {
                     LF_BYTE -> {
-                        handleCommand(message)
+                        val parsedCommand = handleCommand(message)
                         message.clear()
+                        parsedCommand
                     }
                     else -> {
                         message.add(byte)
+                        null
                     }
                 }
             }
@@ -60,22 +63,26 @@ class InputHandler {
                 state = State.NONE
                 when (byte) {
                     CR_BYTE -> {
-                        handleCommand(message)
+                        val parsedCommand = handleCommand(message)
                         message.clear()
+                        parsedCommand
                     }
                     else -> {
                         message.add(byte)
+                        null
                     }
                 }
             }
         }
-    }
 
     /**
      * Handle a fully received command
      * @param command The fully received command
      */
-    private fun handleCommand(command: List<Byte>) {
-        LOG.info("Received command: {}", command)
+    private fun handleCommand(command: List<Byte>): String {
+        LOG.trace("Received command: {}", command)
+        val parsedCommand = String(command.toByteArray())
+        LOG.debug("Received parsed command: {}", parsedCommand)
+        return parsedCommand
     }
 }

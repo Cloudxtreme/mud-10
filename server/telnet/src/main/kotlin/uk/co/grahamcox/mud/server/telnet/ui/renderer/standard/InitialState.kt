@@ -9,8 +9,12 @@ import io.netty.channel.socket.SocketChannel
  */
 @StateName("initial")
 class InitialState(private val channel: SocketChannel,
-                   private val stateChanger: StateChanger) : RendererState {
-    init {
+                   private val stateChanger: StateChanger) : RendererState() {
+
+    /**
+     * Upon entering the Initial state, we display a banner and then straight away move to the Login state
+     */
+    override fun enterState() {
         channel.writeAndFlush("Welcome\r\n")
         stateChanger.changeState("login")
     }

@@ -1,6 +1,7 @@
 package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
 
 import io.netty.channel.socket.SocketChannel
+import kotlin.properties.Delegates
 
 /**
  * Renderer State to handle authentication
@@ -18,11 +19,13 @@ class LoginState(private val channel: SocketChannel) : RendererState() {
     }
 
     /** The current input state that we are in. Note that changing this will send a prompt to the client */
-    private var inputState: InputState = InputState.USERNAME
-        set(value) {
-            field = value
-            showInputPrompt()
-        }
+    private var inputState: InputState by Delegates.observable(InputState.USERNAME) { prop, old, new -> showInputPrompt() }
+
+    /** The username that was entered */
+    private var username: String? = null
+
+    /** The password that was entered */
+    private var password: String? = null
 
     init {
         showInputPrompt()
@@ -34,12 +37,18 @@ class LoginState(private val channel: SocketChannel) : RendererState() {
      * @param command The command to receive
      */
     override fun handleCommand(command: String) {
-        when (inputState) {
-            InputState.USERNAME -> {
-                inputState = InputState.PASSWORD
-            }
-            else -> {
-                inputState = InputState.USERNAME
+        if (command.isEmpty()) {
+            showInputPrompt()
+        } else {
+            when (inputState) {
+                InputState.USERNAME -> {
+                    username = command
+                    inputState = InputState.PASSWORD
+                }
+                else -> {
+                    password = command
+                    inputState = InputState.USERNAME
+                }
             }
         }
     }

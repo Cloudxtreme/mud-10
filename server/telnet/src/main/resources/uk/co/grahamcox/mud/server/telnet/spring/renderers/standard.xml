@@ -20,5 +20,6 @@
 
     <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.LoginState" scope="prototype">
         <constructor-arg name="channel" ref="channel" />
+        <constructor-arg name="userFinder" ref="userFinder" />
     </bean>
 </beans>

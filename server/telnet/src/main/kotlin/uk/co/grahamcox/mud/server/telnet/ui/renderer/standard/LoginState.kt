@@ -1,13 +1,17 @@
 package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
 
 import io.netty.channel.socket.SocketChannel
+import uk.co.grahamcox.mud.users.UserFinder
 import kotlin.properties.Delegates
 
 /**
  * Renderer State to handle authentication
+ * @property userFinder the mechanism to load the user to log in as
+ * @property channel The channel to talk to the user with
  */
 @StateName("login")
-class LoginState(private val channel: SocketChannel) : RendererState() {
+class LoginState(private val userFinder: UserFinder,
+                 private val channel: SocketChannel) : RendererState() {
     /**
      * Enumeration of the current input state that we are in
      */
@@ -46,6 +50,16 @@ class LoginState(private val channel: SocketChannel) : RendererState() {
                     inputState = InputState.PASSWORD
                 }
                 else -> {
+                    val user = userFinder.findUserByEmail(username!!)
+                    if (user == null) {
+                        channel.writeAndFlush("Unknown user\r\n")
+                    } else if (!user.enabled) {
+                        channel.writeAndFlush("Disabled user\r\n")
+                    } else if (!user.password.equals(command)) {
+                        channel.writeAndFlush("Incorrect password\r\n")
+                    } else {
+                        channel.writeAndFlush("Hello, ${user.email}\r\n")
+                    }
                     password = command
                     inputState = InputState.USERNAME
                 }

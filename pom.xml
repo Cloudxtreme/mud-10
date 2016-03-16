@@ -20,6 +20,7 @@
     </prerequisites>
     <modules>
         <module>server</module>
+        <module>game</module>
         <module>webapp</module>
     </modules>
     <scm>

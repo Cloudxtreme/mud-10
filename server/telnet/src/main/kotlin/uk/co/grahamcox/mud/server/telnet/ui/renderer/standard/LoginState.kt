@@ -1,18 +1,18 @@
 package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
 
-import io.netty.channel.socket.SocketChannel
+import uk.co.grahamcox.mud.server.telnet.ui.renderer.output.Output
+import uk.co.grahamcox.mud.server.telnet.ui.renderer.output.Outputter
 import uk.co.grahamcox.mud.users.User
 import uk.co.grahamcox.mud.users.UserFinder
-import kotlin.properties.Delegates
 
 /**
  * Renderer State to handle authentication
  * @property userFinder the mechanism to load the user to log in as
- * @property channel The channel to talk to the user with
+ * @property outputter The mechanism to send messages to the user
  */
 @StateName("login")
 class LoginState(private val userFinder: UserFinder,
-                 private val channel: SocketChannel) : RendererState() {
+                 private val outputter: Outputter) : RendererState() {
     /** The user that we are trying to log in as */
     private var user: User? = null
 
@@ -42,9 +42,9 @@ class LoginState(private val userFinder: UserFinder,
                 val foundUser = userFinder.findUserByEmail(command)
                 if (foundUser == null) {
                     // That email address doesn't exist (yet)
-                    channel.writeAndFlush("Unknown email address. Please register first\r\n")
+                    outputter.output(Output.StringOutput("Unknown email address. Please register first"))
                 } else if (!foundUser.enabled) {
-                    channel.writeAndFlush("That email address has been banned\r\n")
+                    outputter.output(Output.StringOutput("That email address has been banned"))
                 } else {
                     user = foundUser
                 }
@@ -52,10 +52,10 @@ class LoginState(private val userFinder: UserFinder,
                 // We've got a user but no password, so that's what this is
                 if (user!!.password.equals(command)) {
                     // Correct password
-                    channel.writeAndFlush("Welcome\r\n")
+                    outputter.output(Output.StringOutput("Welcome"))
                 } else {
                     // Wrong password
-                    channel.writeAndFlush("Wrong password\r\n")
+                    outputter.output(Output.StringOutput("Wrong password"))
                 }
             }
         }
@@ -67,11 +67,11 @@ class LoginState(private val userFinder: UserFinder,
      */
     private fun showInputPrompt() {
         val message = if (user == null) {
-            "Email address: "
+            Output.StringOutput("Email address: ", false)
         } else {
-            "Password: "
+            Output.StringOutput("Password: ", false)
         }
 
-        channel.writeAndFlush(message)
+        outputter.output(message)
     }
 }

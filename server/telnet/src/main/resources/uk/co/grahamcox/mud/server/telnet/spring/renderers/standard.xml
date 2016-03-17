@@ -13,13 +13,22 @@
         <constructor-arg name="stateChanger" ref="stateChanger" />
     </bean>
 
-    <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialState" scope="prototype">
+    <bean id="outputter"
+          class="uk.co.grahamcox.mud.server.telnet.ui.renderer.output.SimpleOutputter"
+          scope="connection">
         <constructor-arg name="channel" ref="channel" />
+        <constructor-arg name="renderer">
+            <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.output.SimpleRenderer" />
+        </constructor-arg>
+    </bean>
+
+    <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.InitialState" scope="prototype">
+        <constructor-arg name="outputter" ref="outputter" />
         <constructor-arg name="stateChanger" ref="stateChanger" />
     </bean>
 
     <bean class="uk.co.grahamcox.mud.server.telnet.ui.renderer.standard.LoginState" scope="prototype">
-        <constructor-arg name="channel" ref="channel" />
+        <constructor-arg name="outputter" ref="outputter" />
         <constructor-arg name="userFinder" ref="userFinder" />
     </bean>
 </beans>

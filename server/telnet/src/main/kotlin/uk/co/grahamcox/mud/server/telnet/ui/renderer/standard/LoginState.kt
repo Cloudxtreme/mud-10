@@ -1,6 +1,7 @@
 package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
 
 import io.netty.channel.socket.SocketChannel
+import uk.co.grahamcox.mud.users.User
 import uk.co.grahamcox.mud.users.UserFinder
 import kotlin.properties.Delegates
 
@@ -12,24 +13,8 @@ import kotlin.properties.Delegates
 @StateName("login")
 class LoginState(private val userFinder: UserFinder,
                  private val channel: SocketChannel) : RendererState() {
-    /**
-     * Enumeration of the current input state that we are in
-     */
-    private enum class InputState {
-        /** We are expecting a Username */
-        USERNAME,
-        /** We are expecting a Password */
-        PASSWORD
-    }
-
-    /** The current input state that we are in. Note that changing this will send a prompt to the client */
-    private var inputState: InputState by Delegates.observable(InputState.USERNAME) { prop, old, new -> showInputPrompt() }
-
-    /** The username that was entered */
-    private var username: String? = null
-
-    /** The password that was entered */
-    private var password: String? = null
+    /** The user that we are trying to log in as */
+    private var user: User? = null
 
     init {
         showInputPrompt()
@@ -41,41 +26,42 @@ class LoginState(private val userFinder: UserFinder,
      * @param command The command to receive
      */
     override fun handleCommand(command: String) {
-        if (command.isEmpty()) {
-            showInputPrompt()
-        } else {
-            when (inputState) {
-                InputState.USERNAME -> {
-                    username = command
-                    inputState = InputState.PASSWORD
+        if (!command.isNullOrBlank()) {
+            if (user == null) {
+                // We've not yet looked up the user to log in as, so this was the username
+                val foundUser = userFinder.findUserByEmail(command)
+                if (foundUser == null) {
+                    // That email address doesn't exist (yet)
+                    channel.writeAndFlush("Unknown email address. Please register first\r\n")
+                } else if (!foundUser.enabled) {
+                    channel.writeAndFlush("That email address has been banned\r\n")
+                } else {
+                    user = foundUser
                 }
-                else -> {
-                    val user = userFinder.findUserByEmail(username!!)
-                    if (user == null) {
-                        channel.writeAndFlush("Unknown user\r\n")
-                    } else if (!user.enabled) {
-                        channel.writeAndFlush("Disabled user\r\n")
-                    } else if (!user.password.equals(command)) {
-                        channel.writeAndFlush("Incorrect password\r\n")
-                    } else {
-                        channel.writeAndFlush("Hello, ${user.email}\r\n")
-                    }
-                    password = command
-                    inputState = InputState.USERNAME
+            } else {
+                // We've got a user but no password, so that's what this is
+                if (user!!.password.equals(command)) {
+                    // Correct password
+                    channel.writeAndFlush("Welcome\r\n")
+                } else {
+                    // Wrong password
+                    channel.writeAndFlush("Wrong password\r\n")
                 }
             }
         }
+        showInputPrompt()
     }
 
     /**
      * Show the input prompt for the state that we are currently in
      */
     private fun showInputPrompt() {
-        val prompt = when(inputState) {
-            InputState.USERNAME -> "Username: "
-            InputState.PASSWORD -> "Password: "
+        val message = if (user == null) {
+            "Email address: "
+        } else {
+            "Password: "
         }
 
-        channel.writeAndFlush(prompt)
+        channel.writeAndFlush(message)
     }
 }

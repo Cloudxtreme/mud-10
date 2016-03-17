@@ -3,6 +3,17 @@ package uk.co.grahamcox.mud.server.telnet.ui.renderer.standard
 import org.slf4j.LoggerFactory
 
 /**
+ * Representation of some input read by the handler
+ */
+sealed class Input {
+    /**
+     * Input read a line of text
+     * @property line The line of text
+     */
+    class LineInput(val line: String) : Input()
+}
+
+/**
  * Mechanism to receive input bytes and optionally return commands to perform
  */
 class InputHandler {
@@ -34,8 +45,9 @@ class InputHandler {
     /**
      * Handle when we've received an actual byte from the client
      * @param byte The byte that was received
+     * @return the read input, if any
      */
-    fun receiveByte(byte: Byte): String? =
+    fun receiveByte(byte: Byte): Input? =
         when (state) {
             State.NONE -> {
                 when (byte) {
@@ -51,7 +63,7 @@ class InputHandler {
                     LF_BYTE -> {
                         val parsedCommand = handleCommand(message)
                         message.clear()
-                        parsedCommand
+                        Input.LineInput(parsedCommand)
                     }
                     else -> {
                         message.add(byte)
@@ -65,7 +77,7 @@ class InputHandler {
                     CR_BYTE -> {
                         val parsedCommand = handleCommand(message)
                         message.clear()
-                        parsedCommand
+                        Input.LineInput(parsedCommand)
                     }
                     else -> {
                         message.add(byte)

@@ -17,7 +17,7 @@ abstract class  RendererState {
      * Handle a command received from the client
      * @param command The command to handle
      */
-    open fun handleCommand(command: String) {
+    open fun handleCommand(command: Input) {
 
     }
 }

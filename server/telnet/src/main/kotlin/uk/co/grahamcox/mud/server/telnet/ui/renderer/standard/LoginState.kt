@@ -23,9 +23,19 @@ class LoginState(private val userFinder: UserFinder,
     /**
      * Handle receiving a command from the user. What we do with this depends on what field we are next expecting to
      * receive
-     * @param command The command to receive
+     * @param input The input to receive
      */
-    override fun handleCommand(command: String) {
+    override fun handleCommand(input: Input) {
+        when (input) {
+            is Input.LineInput -> handleInputCommand(input.line)
+        }
+    }
+
+    /**
+     * Handle a command that came in as input
+     * @param command The command to handle
+     */
+    private fun handleInputCommand(command: String) {
         if (!command.isNullOrBlank()) {
             if (user == null) {
                 // We've not yet looked up the user to log in as, so this was the username

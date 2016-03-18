@@ -46,20 +46,22 @@
                                 </assembly>
                             </build>
                             <run>
-                                <domainname>mud.mudtest</domainname>
-                                <hostname>mud.mudtest</hostname>
+                                <ports>
+                                    <port>+docker.host.mud:docker.port.mud:12345</port>
+                                </ports>
                             </run>
                         </image>
                         <image>
                             <name>mongo</name>
                             <run>
-                                <domainname>mongo.mudtest</domainname>
+                                <ports>
+                                    <port>+docker.host.mongo:docker.port.mongo:27017</port>
+                                </ports>
                             </run>
                         </image>
                         <image>
                             <name>knickers/mongo-express</name>
                             <run>
-                                <domainname>mongoexpress.mudtest</domainname>
                                 <links>
                                     <link>mongo:mongo</link>
                                 </links>

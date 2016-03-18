@@ -94,6 +94,18 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <host.mongo>${docker.host.mongo}</host.mongo>
+                        <host.mud>${docker.host.mud}</host.mud>
+                        <port.mongo>${docker.port.mongo}</port.mongo>
+                        <port.mud>${docker.port.mud}</port.mud>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>

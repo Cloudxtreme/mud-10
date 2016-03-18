@@ -30,6 +30,45 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <verbose>true</verbose>
+                    <autoPull>always</autoPull>
+                    <images>
+                        <image>
+                            <name>mud</name>
+                            <build>
+                                <from>jetty</from>
+                                <assembly>
+                                    <basedir>/var/lib/jetty/webapps</basedir>
+                                    <descriptorRef>rootWar</descriptorRef>
+                                </assembly>
+                            </build>
+                            <run>
+                                <domainname>mud.mudtest</domainname>
+                                <hostname>mud.mudtest</hostname>
+                            </run>
+                        </image>
+                        <image>
+                            <name>mongo</name>
+                            <run>
+                                <domainname>mongo.mudtest</domainname>
+                            </run>
+                        </image>
+                        <image>
+                            <name>knickers/mongo-express</name>
+                            <run>
+                                <domainname>mongoexpress.mudtest</domainname>
+                                <links>
+                                    <link>mongo:mongo</link>
+                                </links>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>

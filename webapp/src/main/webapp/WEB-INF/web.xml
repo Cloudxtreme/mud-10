@@ -8,7 +8,10 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:uk/co/grahamcox/mud/server/telnet/spring/context.xml</param-value>
+        <param-value>
+            classpath:uk/co/grahamcox/mud/spring/context.xml
+            classpath:uk/co/grahamcox/mud/server/telnet/spring/context.xml
+        </param-value>
     </context-param>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

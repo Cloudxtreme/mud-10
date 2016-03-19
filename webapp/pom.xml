@@ -60,6 +60,7 @@
                     <images>
                         <image>
                             <name>mud</name>
+                            <alias>mud</alias>
                             <build>
                                 <from>jetty</from>
                                 <assembly>
@@ -68,8 +69,10 @@
                                 </assembly>
                             </build>
                             <run>
+                                <namingStrategy>alias</namingStrategy>
                                 <ports>
                                     <port>+docker.host.mud:docker.port.mud:12345</port>
+                                    <port>12345:12345</port>
                                 </ports>
                                 <links>
                                     <link>mongo:mongo</link>
@@ -78,7 +81,9 @@
                         </image>
                         <image>
                             <name>mongo</name>
+                            <alias>mud-mongo</alias>
                             <run>
+                                <namingStrategy>alias</namingStrategy>
                                 <ports>
                                     <port>+docker.host.mongo:docker.port.mongo:27017</port>
                                 </ports>
@@ -86,7 +91,12 @@
                         </image>
                         <image>
                             <name>knickers/mongo-express</name>
+                            <alias>mud-mongo-express</alias>
                             <run>
+                                <namingStrategy>alias</namingStrategy>
+                                <ports>
+                                    <port>8081:8081</port>
+                                </ports>
                                 <links>
                                     <link>mongo:mongo</link>
                                 </links>

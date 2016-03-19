@@ -41,8 +41,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- Dependency Versions -->
+        <version.jackson>2.7.3</version.jackson>
         <version.jdk>1.8</version.jdk>
-        <version.kotlin>1.0.0</version.kotlin>
+        <version.kotlin>1.0.1</version.kotlin>
         <version.maven>3.2.1</version.maven>
         <version.slf4j>1.7.16</version.slf4j>
         <version.spring>4.2.5.RELEASE</version.spring>
@@ -58,6 +59,26 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${version.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${version.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${version.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-kotlin</artifactId>
+                <version>${version.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -99,6 +120,16 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>${version.kotlin}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-core</artifactId>
+                <version>3.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongojack</groupId>
+                <artifactId>mongojack</artifactId>
+                <version>2.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

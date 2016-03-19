@@ -3,5 +3,22 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="userFinder" class="uk.co.grahamcox.mud.users.UserFinderImpl" />
+    <bean id="userDao" class="uk.co.grahamcox.mud.users.dao.MongoUserDao">
+        <constructor-arg name="userCollection">
+            <bean class="org.mongojack.JacksonDBCollection" factory-method="wrap">
+                <constructor-arg name="dbCollection">
+                    <bean factory-bean="mongoDb" factory-method="getCollection">
+                        <constructor-arg name="name" value="users" />
+                    </bean>
+                </constructor-arg>
+                <constructor-arg name="type" value="uk.co.grahamcox.mud.users.dao.UserModel" />
+                <constructor-arg name="keyType" value="java.lang.String" />
+                <constructor-arg name="objectMapper" ref="objectMapper" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="userFinder" class="uk.co.grahamcox.mud.users.UserFinderImpl">
+        <constructor-arg name="userDao" ref="userDao" />
+    </bean>
 </beans>

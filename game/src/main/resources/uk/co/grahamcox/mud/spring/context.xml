@@ -7,5 +7,6 @@
 
     <context:property-placeholder />
 
+    <import resource="database.xml" />
     <import resource="users.xml" />
 </beans>

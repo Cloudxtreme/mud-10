@@ -57,7 +57,6 @@
                 </executions>
                 <configuration>
                     <verbose>true</verbose>
-                    <autoPull>always</autoPull>
                     <images>
                         <image>
                             <name>mud</name>
@@ -72,6 +71,9 @@
                                 <ports>
                                     <port>+docker.host.mud:docker.port.mud:12345</port>
                                 </ports>
+                                <links>
+                                    <link>mongo:mongo</link>
+                                </links>
                             </run>
                         </image>
                         <image>

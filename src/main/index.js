@@ -1,5 +1,8 @@
-const name = 'Mud';
+import {startServer} from './server';
 
-const l = (name) => `Hello, ${name}`;
-
-console.log(l(name));
+startServer()
+    .then((server) => {
+        console.log('Started server');
+    }, (err) => {
+        console.log(`Error starting server: ${err}`);
+    });

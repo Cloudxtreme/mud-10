@@ -43,6 +43,7 @@
     "hapi": "^13.2.1",
     "hapi-alive": "^1.2.0",
     "hapi-info": "^2.0.1",
+    "hapi-route-glob-reg": "^1.0.0",
     "hapi-routes-status": "^2.1.1",
     "hapi-swaggered": "^2.6.0",
     "hapi-swaggered-ui": "^2.3.1",

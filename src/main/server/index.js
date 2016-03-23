@@ -84,6 +84,15 @@ const manifest = {
                 path: '/api/docs'
             }
         }
+    }, {
+        plugin: {
+            register: 'hapi-route-glob-reg',
+            options: {
+                directory: [
+                    `${__dirname}/routes/**`
+                ]
+            }
+        }
     }]
 }
 

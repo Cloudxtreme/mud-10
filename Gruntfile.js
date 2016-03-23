@@ -39,6 +39,27 @@ module.exports = function(grunt) {
             main: {
                 path: 'src/main'
             }
+        },
+        notify: {
+            watch_start: {
+                options: {
+                    message: 'Rebuild and restart complete'
+                }
+            }
+        },
+        watch: {
+            start: {
+                files: [
+                    'src/**/*',
+                    'Gruntfile.js',
+                    'eslintrc'
+                ],
+                tasks: ['start', 'notify:watch_start'],
+                options: {
+                    interrupt: true,
+                    atBegin: true
+                }
+            }
         }
     });
 

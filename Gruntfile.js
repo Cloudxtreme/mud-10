@@ -40,6 +40,17 @@ module.exports = function(grunt) {
                 path: 'src/main'
             }
         },
+        mochaTest: {
+            main: {
+                src: [
+                    'target/mud/**/*.spec.js'
+                ],
+                options: {
+                    reporter: 'spec',
+                    growl: true
+                }
+            }
+        },
         notify: {
             watch_start: {
                 options: {
@@ -63,6 +74,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('build', ['eslint', 'jscpd', 'babel']);
+    grunt.registerTask('build', ['eslint', 'jscpd', 'babel', 'mochaTest']);
     grunt.registerTask('start', ['build', 'execute:main']);
 };

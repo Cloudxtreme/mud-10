@@ -65,6 +65,7 @@ const manifest = {
             register: 'hapi-swaggered',
             options: {
                 endpoint: '/api/swagger',
+                stripPrefix: '/api',
                 info: {
                     title: 'WebMUD',
                     description: 'Web based MUD',

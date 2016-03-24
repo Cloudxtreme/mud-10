@@ -1,3 +1,7 @@
+import Boom from 'boom';
+
+const AUTH_SCHEME = 'Bearer';
+const BEARER_PREFIX = AUTH_SCHEME + ' ';
 /**
  * The actual implementation of the OAuth2 Scheme that we are going to use
  * @param {Server} server The server to work with
@@ -9,14 +13,38 @@ function oauth2Scheme(server, options) {
         authenticate: (request, reply) => {
             const authHeader = request.headers.authorization;
 
-            if (authHeader) {
-                reply.continue({
-                    credentials: {
-                        token: authHeader
-                    }
+            try {
+                if (typeof authHeader === 'undefined') {
+                    throw 'No token provided';
+                }
+                if (!authHeader.startsWith(BEARER_PREFIX)) {
+                    throw 'Unsupported authentication type provided';
+                }
+            } catch (e) {
+                return reply(Boom.unauthorized(e, AUTH_SCHEME));
+            }
+
+            const token = authHeader.substr(BEARER_PREFIX.length);
+            const credentials = {
+                token
+            };
+
+            try {
+                if (token === '123456') {
+                    throw 'Token has expired';
+                }
+
+                if (token !== 'abcdef') {
+                    throw 'Invalid token';
+                }
+
+                return reply.continue({
+                    credentials
                 });
-            } else {
-                reply({error: 'No token present'});
+            } catch (e) {
+                return reply(Boom.unauthorized(e, AUTH_SCHEME), null, {
+                    credentials
+                });
             }
         }
     }

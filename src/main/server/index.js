@@ -107,6 +107,8 @@ const manifest = {
         }
     }, {
         plugin: 'hapi-to'
+    }, {
+        plugin: './auth/authPlugin'
     }]
 }
 

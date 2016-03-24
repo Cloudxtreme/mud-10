@@ -59,13 +59,13 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            start: {
+            build: {
                 files: [
                     'src/**/*',
                     'Gruntfile.js',
                     'eslintrc'
                 ],
-                tasks: ['start', 'notify:watch_start'],
+                tasks: ['build'],
                 options: {
                     interrupt: true,
                     atBegin: true

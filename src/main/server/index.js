@@ -11,11 +11,20 @@ const manifest = {
         }
     ],
     registrations: [{
-        plugin: 'blipp'
-    }, {
         plugin: 'inert'
     }, {
         plugin: 'vision'
+    }, {
+        plugin: 'blipp'
+    }, {
+        plugin: {
+            register: 'consistency',
+            options: {
+                uriParam: 'apiVersion',
+                acceptNamespace: 'mud',
+                customHeaderKey: 'api-version'
+            }
+        }
     }, {
         plugin: {
             register: 'good',
@@ -36,12 +45,12 @@ const manifest = {
         }
     }, {
         plugin: {
-            register: 'hapi-alive',
+            register: 'hale',
             options: {
                 path: '/api/health',
                 tags: ['health', 'monitor', 'api'],
-                healthCheck: (server, callback) => {
-                    callback();
+                metadata: {
+                    name: 'mud'
                 }
             }
         }
@@ -69,6 +78,8 @@ const manifest = {
             }
         }
     }, {
+        plugin: 'hapi-status-cat'
+    }, {
         plugin: {
             register: 'hapi-swaggered',
             options: {
@@ -93,6 +104,8 @@ const manifest = {
                 path: '/api/docs'
             }
         }
+    }, {
+        plugin: 'hapi-to'
     }]
 }
 

@@ -1,10 +1,12 @@
 import Joi from 'joi';
+import status from 'hapi-status';
 
 export function routes(server) {
     server.route([{
         method: 'GET',
         path: '/api/debug/ping',
         config: {
+            id: 'ping',
             tags: ['api', 'debug'],
             description: 'Debug handler to get a response back from the server',
             response: {
@@ -14,10 +16,24 @@ export function routes(server) {
                     allowUnknown: true,
                     stripUnknown: false
                 })
+            },
+            handler: {
+                versioned: {
+                    'v1.0': function(request, reply) {
+                        const result = {
+                            ping: 'Pong',
+                            url: request.to('ping')
+                        };
+                        return reply(result);
+                    },
+                    'v2.0': function(request, reply) {
+                        const result = {
+                            ping: 'Pong'
+                        };
+                        return reply(result);
+                    }
+                }
             }
-        },
-        handler: function(request, reply) {
-            return reply({ping: 'Pong'});
         }
     }]);
 }

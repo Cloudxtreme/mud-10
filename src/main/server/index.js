@@ -1,3 +1,4 @@
+import config from 'config';
 import Glue from 'glue';
 
 const manifest = {
@@ -6,7 +7,7 @@ const manifest = {
     },
     connections: [
         {
-            port: 3000,
+            port: config.get('server.web.port'),
             labels: ['web']
         }
     ],

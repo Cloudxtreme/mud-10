@@ -2,7 +2,7 @@ import Glue from 'glue';
 
 const manifest = {
     server: {
-        
+
     },
     connections: [
         {
@@ -11,37 +11,11 @@ const manifest = {
         }
     ],
     registrations: [{
-        plugin: {
-            register: 'hapi-info',
-            options: {
-                path: '/api/info'
-            }
-        }
-    }, {
-        plugin: 'hapi-routes-status',
-        options: {
-            routes: {
-                prefix: '/api'
-            }
-        }
+        plugin: 'blipp'
     }, {
         plugin: 'inert'
     }, {
         plugin: 'vision'
-    }, {
-        plugin: 'blipp'
-    }, {
-        plugin: {
-            register: 'hapi-alive',
-            options: {
-                path: '/api/health',
-                tags: ['health', 'monitor', 'api'],
-                healthCheck: (server, callback) => {
-                    callback();
-                }
-            }
-            
-        }
     }, {
         plugin: {
             register: 'good',
@@ -62,27 +36,20 @@ const manifest = {
         }
     }, {
         plugin: {
-            register: 'hapi-swaggered',
+            register: 'hapi-alive',
             options: {
-                endpoint: '/api/swagger',
-                stripPrefix: '/api',
-                info: {
-                    title: 'WebMUD',
-                    description: 'Web based MUD',
-                    version: '1.0'
-                },
-                tagging: {
-                    mode: 'path',
-                    
-                },
-                routeTags: ['api']
+                path: '/api/health',
+                tags: ['health', 'monitor', 'api'],
+                healthCheck: (server, callback) => {
+                    callback();
+                }
             }
         }
     }, {
         plugin: {
-            register: 'hapi-swaggered-ui',
+            register: 'hapi-info',
             options: {
-                path: '/api/docs'
+                path: '/api/info'
             }
         }
     }, {
@@ -94,6 +61,38 @@ const manifest = {
                 ]
             }
         }
+    }, {
+        plugin: 'hapi-routes-status',
+        options: {
+            routes: {
+                prefix: '/api'
+            }
+        }
+    }, {
+        plugin: {
+            register: 'hapi-swaggered',
+            options: {
+                endpoint: '/api/swagger',
+                stripPrefix: '/api',
+                info: {
+                    title: 'WebMUD',
+                    description: 'Web based MUD',
+                    version: '1.0'
+                },
+                tagging: {
+                    mode: 'path',
+
+                },
+                routeTags: ['api']
+            }
+        }
+    }, {
+        plugin: {
+            register: 'hapi-swaggered-ui',
+            options: {
+                path: '/api/docs'
+            }
+        }
     }]
 }
 
@@ -102,7 +101,7 @@ export function startServer() {
         const options = {
             relativeTo: __dirname
         };
-        
+
         Glue.compose(manifest, options, (err, server) => {
             if (err) {
                 reject(err);

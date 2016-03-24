@@ -45,6 +45,8 @@ const manifest = {
             }
         }
     }, {
+        plugin: './auth/authPlugin'
+    }, {
         plugin: {
             register: 'hale',
             options: {
@@ -107,8 +109,6 @@ const manifest = {
         }
     }, {
         plugin: 'hapi-to'
-    }, {
-        plugin: './auth/authPlugin'
     }]
 }
 

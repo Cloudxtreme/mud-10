@@ -53,6 +53,7 @@
     "hapi-to": "^1.0.0",
     "inert": "^3.2.0",
     "joi": "^8.0.5",
+    "jsonwebtoken": "^5.7.0",
     "moment-timezone": "^0.5.3",
     "node-uuid": "^1.4.7",
     "vision": "^4.0.1"

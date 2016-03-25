@@ -67,7 +67,15 @@ describe('TokenEncoder', function() {
                 });
             });
 
-            after(function() {
+            it('works when doing it for real', function() {
+                return encodeToken(token).then(function(jwt) {
+                    console.log(jwt);
+                    expect(jwt).to.be.a.string;
+                    expect(jwt).to.match(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/);
+                });
+            });
+
+            afterEach(function() {
                 TokenEncoderRewire.__ResetDependency__('jwt');
             });
         });

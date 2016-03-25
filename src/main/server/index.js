@@ -66,11 +66,9 @@ const manifest = {
         }
     }, {
         plugin: {
-            register: 'hapi-route-glob-reg',
+            register: './routes/routesPlugin',
             options: {
-                directory: [
-                    `${__dirname}/routes/**`
-                ]
+                files: `${__dirname}/routes/**/*.route.js`
             }
         }
     }, {

@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import moment from 'moment-timezone';
-import {Token} from './token';
+import {Token} from '../token';
 
 describe('Token', function() {
     describe('Full constructor', function() {

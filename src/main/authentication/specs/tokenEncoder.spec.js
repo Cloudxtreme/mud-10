@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import moment from 'moment-timezone';
-import {Token} from './token';
-import {encodeToken} from './tokenEncoder';
+import {Token} from '../token';
+import {encodeToken} from '../tokenEncoder';
 
 describe('TokenEncoder', function() {
     describe('encodeToken', function() {

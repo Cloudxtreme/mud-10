@@ -6,12 +6,29 @@ import {encodeToken, __RewireAPI__ as TokenEncoderRewire} from '../tokenEncoder'
 
 describe('TokenEncoder', function() {
     describe('encodeToken', function() {
+        const start = moment().subtract(30, 'minutes');
+        const tokenId = 'thisIsTheTokenId';
+        const userId = 'thisIsTheUserId';
+        const signedToken = 'thisIsTheSignedToken';
+
+        describe('invalid token', function() {
+            it('fails when provided with the wrong type', function() {
+                expect(() => encodeToken('hello')).to.throw();
+            });
+            it('fails when expiry time is in the past', function() {
+                const end = moment().subtract(1, 'minutes');
+
+                const token = new Token({startTime: start,
+                    expiryTime: end,
+                    tokenId,
+                    userId});
+
+                    expect(() => encodeToken(token)).to.throw();
+            });
+        });
+
         describe('valid token', function() {
-            const start = moment().add(30, 'minutes');
             const end = moment().add(1, 'hours');
-            const tokenId = 'thisIsTheTokenId';
-            const userId = 'thisIsTheUserId';
-            const signedToken = 'thisIsTheSignedToken';
 
             const token = new Token({startTime: start,
                 expiryTime: end,
@@ -44,7 +61,7 @@ describe('TokenEncoder', function() {
                     expect(stubJwt.firstCall.args[2]).to.have.property('jwtid', tokenId);
                     expect(stubJwt.firstCall.args[2]).to.have.property('subject', userId);
                     expect(stubJwt.firstCall.args[2]).to.have.property('expiresIn').within(3598, 3602);
-                    expect(stubJwt.firstCall.args[2]).to.have.property('notBefore').within(1798, 1802);
+                    expect(stubJwt.firstCall.args[2]).to.have.property('notBefore').within(-1802, -1798);
 
                     expect(jwt).to.equal(signedToken);
                 });

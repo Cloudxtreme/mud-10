@@ -22,6 +22,8 @@ export function register(server, options, next) {
                 server.route(routes);
             });
         next();
+    }).catch(function(err) {
+        next(err);
     });
 }
 

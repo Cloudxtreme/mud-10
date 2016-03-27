@@ -1,7 +1,7 @@
 {
     "parser": "babel-eslint",
     "rules": {
-        "valid-jsdoc": [2, {
+        "valid-jsdoc": [1, {
             "requireReturn": false,
             "requireParamDescription": true,
             "requireReturnDescription": true

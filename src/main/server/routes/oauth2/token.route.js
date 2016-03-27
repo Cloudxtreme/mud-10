@@ -9,7 +9,7 @@ import {findUserByEmail} from '../../../user/userLoader';
  * @param {String} scope The scopes to authenticate for
  * @param {Reply} reply The reply interface
  */
-function handlePasswordToken({username, password, scope}, reply) {
+async function handlePasswordToken({username, password, scope}, reply) {
     const missingParams = [];
     if (typeof username === 'undefined') {
         missingParams.push('username');
@@ -24,31 +24,30 @@ function handlePasswordToken({username, password, scope}, reply) {
         });
         response.statusCode = 400;
     } else {
-        findUserByEmail(username)
-            .then((user) => {
-                if (!user.enabled) {
-                    throw new Error('User account is banned');
-                }
-                return user;
-            }).then((user) => {
-                if (!user.password.equals(password)) {
-                    throw new Error('Wrong password');
-                }
-                return user;
-            }).then((user) => {
-                reply({
-                    access_token: 'abcdef',
-                    token_type: 'Bearer',
-                    expires_in: 3600
-                });
-            }).catch((err) => {
-                console.log(err);
-                const response = reply({
-                    error: 'invalid_grant',
-                    error_description: 'Invalid user details or user account is banned'
-                });
-                response.statusCode = 400;
+        try {
+            console.log('Looking up user');
+            const user = await findUserByEmail(username);
+            console.log('Found user: ' + user);
+            if (!user.enabled) {
+                throw new Error('User account is banned');
+            }
+            if (!user.password.equals(password)) {
+                throw new Error('Wrong password');
+            }
+            console.log('User is OK');
+            reply({
+                access_token: 'abcdef',
+                token_type: 'Bearer',
+                expires_in: 3600
             });
+        } catch (e) {
+            console.log(e);
+            const response = reply({
+                error: 'invalid_grant',
+                error_description: 'Invalid user details or user account is banned'
+            });
+            response.statusCode = 400;
+        }
     }
 }
 

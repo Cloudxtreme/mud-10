@@ -18,6 +18,13 @@ export const request = {
     },
 
     /**
+     * Reset the last response received
+     */
+    reset: function() {
+        delete this._lastResponse;
+    },
+
+    /**
      * Make a POST request, providing some form data to send
      * @param {String} url The URL to POST to, relative to the URL base specified
      * @param {Object} formData the Form Data to POST

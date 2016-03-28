@@ -19,7 +19,7 @@ module.exports = function () {
     });
 
     this.Then(/^I get a successful access token response$/, function() {
-        expect(this.request.lastResponse()).to.be.defined;
+        expect(this.request.lastResponse(), 'the last response').to.exist;
         expect(this.request.lastResponse().statusCode).to.equal(200);
         expect(this.request.lastResponse().body).to.be.an.object;
         expect(this.request.lastResponse().body).to.have.property('access_token');
@@ -28,7 +28,7 @@ module.exports = function () {
     });
 
     this.Then(/^I get an error response of "([^"]+)"$/, function(errorCode) {
-        expect(this.request.lastResponse()).to.be.defined;
+        expect(this.request.lastResponse(), 'the last response').to.exist;
         expect(this.request.lastResponse().statusCode).to.equal(400);
         expect(this.request.lastResponse().body).to.be.an.object;
         expect(this.request.lastResponse().body).to.have.property('error', errorCode);

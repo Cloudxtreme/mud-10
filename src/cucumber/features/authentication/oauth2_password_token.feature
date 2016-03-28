@@ -1,3 +1,4 @@
+@api @oauth2
 Feature: OAuth2 Username Password Credentials Authentication
     Scenario: Successful authentication
         Given a user exists with details:
@@ -7,7 +8,7 @@ Feature: OAuth2 Username Password Credentials Authentication
         When I request a username password credentials grant for:
             | Username | graham@grahamcox.co.uk |
             | Password | password               |
-        Then I get a successful response
+        Then I get a successful access token response
 
     Scenario: Incorrect password
         Given a user exists with details:

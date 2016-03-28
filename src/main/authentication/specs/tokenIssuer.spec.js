@@ -17,7 +17,7 @@ describe('TokenIsuer', function() {
         });
         it('has the correct validity period', function() {
             const validity = token.expiryTime.diff(token.startTime);
-            expect(validity).to.equal(86400000); // 1 day in millis
+            expect(validity).to.be.within(86399998, 86400002); // 1 day in millis
         });
     });
 });

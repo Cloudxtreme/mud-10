@@ -1,3 +1,5 @@
+import 'babel-polyfill';
+
 import {startServer} from '../../mud/server';
 
 let _server;

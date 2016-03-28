@@ -1,6 +1,9 @@
 import Joi from 'joi';
 import Boom from 'boom';
 import {findUserByEmail} from '../../../user/userLoader';
+import {issueToken} from '../../../authentication/tokenIssuer';
+import {encodeToken} from '../../../authentication/tokenEncoder';
+import moment from 'moment-timezone';
 
 /**
  * Look up the user details for the given email address and password
@@ -37,6 +40,25 @@ function lookupUser(email, password) {
 }
 
 /**
+ * Render the provided Access Token in the correct format for the OAuth2 response
+ * @param {Token} token The access token to renderToken
+ * @return {Promise} a promise for the rendered token
+ */
+function renderToken(token) {
+    return encodeToken(token)
+        .then((encodedToken) => {
+            const now = moment();
+            const expiryPeriod = token.expiryTime.diff(now, 'seconds');
+
+            return {
+                access_token: encodedToken,
+                token_type: 'Bearer',
+                expires_in: expiryPeriod
+            };
+        });
+}
+
+/**
  * Handle a Resource Owner Password Credentials grant
  * @param {String} username The username to authenticate for
  * @param {String} password The password to authenticate for
@@ -61,11 +83,9 @@ async function handlePasswordToken({username, password, scope}, reply) {
         try {
             const user = await lookupUser(username, password);
             console.log(`Got user: ${user}`);
-            reply({
-                access_token: 'abcdef',
-                token_type: 'Bearer',
-                expires_in: 3600
-            });
+            const accessToken = issueToken(user);
+            const renderedToken = await renderToken(accessToken);
+            reply(renderedToken);
         } catch (e) {
             console.log(e);
             const response = reply(e);

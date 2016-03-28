@@ -21,9 +21,33 @@ module.exports = function(grunt) {
                     src: ['**/*.js'],
                     dest: 'target/mud'
                 }]
+            },
+            cucumber: {
+                files: [{
+                    expand: true,
+                    cwd: 'src/cucumber/steps',
+                    src: ['**/*.js'],
+                    dest: 'target/cucumber/steps'
+                }]
             }
         },
         clean: ['target'],
+        cucumberjs: {
+            options: {
+                theme: 'bootstrap',
+                output: 'target/features_report.html',
+                format: 'pretty',
+                saveJson: true
+            },
+            main: {
+                options: {
+                    steps: 'target/cucumber/steps',
+                },
+                src: [
+                    'src/cucumber/features'
+                ]
+            }
+        },
         eslint: {
             options: {
                 configFile: 'eslintrc'
@@ -32,6 +56,12 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     src: ['src/main/**/*.js']
+                }]
+            },
+            cucumber: {
+                files: [{
+                    expand: true,
+                    src: ['src/cucumber/steps/**/*.js']
                 }]
             }
         },
@@ -43,6 +73,9 @@ module.exports = function(grunt) {
         jscpd: {
             main: {
                 path: 'src/main'
+            },
+            cucumber: {
+                path: 'src/cucumber/steps'
             }
         },
         mochaTest: {
@@ -53,13 +86,6 @@ module.exports = function(grunt) {
                 options: {
                     reporter: 'spec',
                     growl: true
-                }
-            }
-        },
-        notify: {
-            watch_start: {
-                options: {
-                    message: 'Rebuild and restart complete'
                 }
             }
         },
@@ -79,6 +105,8 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('build', ['eslint', 'jscpd', 'babel', 'mochaTest']);
+    grunt.registerTask('build', ['eslint:main', 'jscpd:main', 'babel:main', 'mochaTest']);
+    grunt.registerTask('buildCucumber', ['eslint:cucumber', 'jscpd:cucumber', 'babel:cucumber']);
+    grunt.registerTask('cucumber', ['build', 'buildCucumber', 'cucumberjs']);
     grunt.registerTask('start', ['build', 'execute:main']);
 };

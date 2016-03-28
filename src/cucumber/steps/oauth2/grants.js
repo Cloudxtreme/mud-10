@@ -11,37 +11,26 @@ module.exports = function () {
             throw new Error('No password provided');
         }
 
-        request({
-            method: 'POST',
-            uri: `${this._serverBase}/api/oauth2/token`,
-            form: {
-                grant_type: 'password',
-                username: userDetailsHash.Username,
-                password: userDetailsHash.Password
-            }
-        }, (error, response, body) => {
-            this._response = {
-                body: JSON.parse(body),
-                headers: response.headers,
-                statusCode: response.statusCode
-            };
-            callback();
-        });
+        this.request.post('/api/oauth2/token', {
+            grant_type: 'password',
+            username: userDetailsHash.Username,
+            password: userDetailsHash.Password
+        }).then(() => callback(), (error) => callback(error));
     });
 
     this.Then(/^I get a successful access token response$/, function() {
-        expect(this._response).to.be.defined;
-        expect(this._response.statusCode).to.equal(200);
-        expect(this._response.body).to.be.an.object;
-        expect(this._response.body).to.have.property('access_token');
-        expect(this._response.body).to.have.property('token_type', 'Bearer');
-        expect(this._response.body).to.have.property('expires_in').within(86395, 86405);
+        expect(this.request.lastResponse()).to.be.defined;
+        expect(this.request.lastResponse().statusCode).to.equal(200);
+        expect(this.request.lastResponse().body).to.be.an.object;
+        expect(this.request.lastResponse().body).to.have.property('access_token');
+        expect(this.request.lastResponse().body).to.have.property('token_type', 'Bearer');
+        expect(this.request.lastResponse().body).to.have.property('expires_in').within(86395, 86405);
     });
 
     this.Then(/^I get an error response of "([^"]+)"$/, function(errorCode) {
-        expect(this._response).to.be.defined;
-        expect(this._response.statusCode).to.equal(400);
-        expect(this._response.body).to.be.an.object;
-        expect(this._response.body).to.have.property('error', errorCode);
+        expect(this.request.lastResponse()).to.be.defined;
+        expect(this.request.lastResponse().statusCode).to.equal(400);
+        expect(this.request.lastResponse().body).to.be.an.object;
+        expect(this.request.lastResponse().body).to.have.property('error', errorCode);
     });
 };

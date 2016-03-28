@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 
-import {startServer} from '../../mud/server';
+import {startServer} from '../../../mud/server';
 
 let _server;
 
@@ -17,7 +17,7 @@ module.exports = function() {
 
     this.Before(function(scenario) {
         if (_server) {
-            this._serverBase = _server.info.uri;
+            this.request.setUrlBase(_server.info.uri);
         }
     });
 

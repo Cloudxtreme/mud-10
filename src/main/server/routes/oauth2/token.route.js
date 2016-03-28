@@ -3,6 +3,40 @@ import Boom from 'boom';
 import {findUserByEmail} from '../../../user/userLoader';
 
 /**
+ * Look up the user details for the given email address and password
+ * @param {String} email The email address to look up
+ * @param {String} password The password to match against
+ * @return {Promise} a Promise for the user details. If rejected then the rejection is an OAuth2 error payload
+ */
+function lookupUser(email, password) {
+    return findUserByEmail(email)
+        .then((user) => {
+            console.log('Checking password');
+            if (!user.password.equals(password)) {
+                throw new Error('Invalid password');
+            }
+            return user;
+        })
+        .catch((err) => {
+            console.log('Error getting user details: ' + err);
+            throw {
+                error: 'invalid_grant',
+                error_description: 'Invalid Username or Password'
+            };
+        })
+        .then((user) => {
+            console.log('Checking if user is enabled');
+            if (!user.enabled) {
+                throw {
+                    error: 'invalid_grant',
+                    error_description: 'User account is banned'
+                };
+            }
+            return user;
+        })
+}
+
+/**
  * Handle a Resource Owner Password Credentials grant
  * @param {String} username The username to authenticate for
  * @param {String} password The password to authenticate for
@@ -25,16 +59,8 @@ async function handlePasswordToken({username, password, scope}, reply) {
         response.statusCode = 400;
     } else {
         try {
-            console.log('Looking up user');
-            const user = await findUserByEmail(username);
-            console.log('Found user: ' + user);
-            if (!user.enabled) {
-                throw new Error('User account is banned');
-            }
-            if (!user.password.equals(password)) {
-                throw new Error('Wrong password');
-            }
-            console.log('User is OK');
+            const user = await lookupUser(username, password);
+            console.log(`Got user: ${user}`);
             reply({
                 access_token: 'abcdef',
                 token_type: 'Bearer',
@@ -42,10 +68,7 @@ async function handlePasswordToken({username, password, scope}, reply) {
             });
         } catch (e) {
             console.log(e);
-            const response = reply({
-                error: 'invalid_grant',
-                error_description: 'Invalid user details or user account is banned'
-            });
+            const response = reply(e);
             response.statusCode = 400;
         }
     }

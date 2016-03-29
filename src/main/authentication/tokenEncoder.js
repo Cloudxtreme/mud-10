@@ -55,6 +55,7 @@ export function decodeToken(encoded) {
             issuer: ISSUER
         }, function(err, decoded) {
             if (err) {
+                console.log(`Error decoding token: ${err}`);
                 reject(err);
             } else {
                 const token = new Token({
@@ -63,6 +64,7 @@ export function decodeToken(encoded) {
                     tokenId: decoded.jti,
                     userId: decoded.sub
                 });
+                console.log(`Decoded token: ${token}`);
                 resolve(token);
             }
         });

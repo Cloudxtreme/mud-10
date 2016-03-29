@@ -17,7 +17,8 @@ export const routes = {
         },
         handler: function(request, reply) {
             return reply({
-                token: request.auth.credentials.token
+                token: request.auth.credentials.rawToken,
+                accessToken: request.auth.credentials.accessToken
             });
         }
     }

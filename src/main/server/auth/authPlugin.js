@@ -1,7 +1,9 @@
 import Boom from 'boom';
+import {decodeToken} from '../../authentication/tokenEncoder';
 
 const AUTH_SCHEME = 'Bearer';
 const BEARER_PREFIX = AUTH_SCHEME + ' ';
+
 /**
  * The actual implementation of the OAuth2 Scheme that we are going to use
  * @param {Server} server The server to work with
@@ -25,27 +27,23 @@ function oauth2Scheme(server, options) {
             }
 
             const token = authHeader.substr(BEARER_PREFIX.length);
-            const credentials = {
-                token
-            };
-
-            try {
-                if (token === '123456') {
-                    throw 'Token has expired';
-                }
-
-                if (token !== 'abcdef') {
-                    throw 'Invalid token';
-                }
-
-                return reply.continue({
-                    credentials
+            return decodeToken(token)
+                .then(accessToken => {
+                    return reply.continue({
+                        credentials: {
+                            rawToken: token,
+                            accessToken: accessToken
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                    return reply(Boom.unauthorized('Invalid access token', AUTH_SCHEME), null, {
+                        credentials: {
+                            rawToken: token
+                        }
+                    });
                 });
-            } catch (e) {
-                return reply(Boom.unauthorized(e, AUTH_SCHEME), null, {
-                    credentials
-                });
-            }
         }
     }
 }

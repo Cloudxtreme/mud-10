@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import moment from 'moment-timezone';
 import sinon from 'sinon';
 import {Token} from '../token';
-import {encodeToken, __RewireAPI__ as TokenEncoderRewire} from '../tokenEncoder';
+import {encodeToken, decodeToken, __RewireAPI__ as TokenEncoderRewire} from '../tokenEncoder';
 
 describe('TokenEncoder', function() {
     describe('encodeToken', function() {
@@ -77,6 +77,60 @@ describe('TokenEncoder', function() {
 
             afterEach(function() {
                 TokenEncoderRewire.__ResetDependency__('jwt');
+            });
+        });
+    });
+
+    describe('decodeToken', function() {
+        describe('An invalid token', function() {
+            it('does not decode cleanly', function() {
+                return expect(decodeToken('abcdef')).to.eventually.be.rejected;
+            });
+        });
+        describe('A valid token', function() {
+            const start = moment().subtract(30, 'minutes');
+            const end = moment().add(1, 'hours');
+            const tokenId = 'thisIsTheTokenId';
+            const userId = 'thisIsTheUserId';
+
+            let encodedToken;
+
+            before(function() {
+                const token = new Token({startTime: start,
+                    expiryTime: end,
+                    tokenId,
+                    userId});
+                return encodeToken(token).then(function(jwt) {
+                    encodedToken = jwt;
+                });
+            });
+
+            it('decodes cleanly', function() {
+                return decodeToken(encodedToken);
+            });
+            it('has the correct Token ID', function() {
+                return decodeToken(encodedToken)
+                    .then(token => {
+                        expect(token.tokenId).to.equal(tokenId);
+                    });
+            });
+            it('has the correct User ID', function() {
+                return decodeToken(encodedToken)
+                    .then(token => {
+                        expect(token.userId).to.equal(userId);
+                    });
+            });
+            it('has the correct start time', function() {
+                return decodeToken(encodedToken)
+                    .then(token => {
+                        expect(token.startTime.diff(start, 'seconds')).to.be.within(-1, 1);
+                    });
+            });
+            it('has the correct expiry time', function() {
+                return decodeToken(encodedToken)
+                    .then(token => {
+                        expect(token.expiryTime.diff(end, 'seconds')).to.be.within(-1, 1);
+                    });
             });
         });
     });

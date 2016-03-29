@@ -85,7 +85,8 @@ module.exports = function(grunt) {
                 ],
                 options: {
                     reporter: 'spec',
-                    growl: true
+                    growl: true,
+                    require: 'target/mud/testSetup'
                 }
             }
         },

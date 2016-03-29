@@ -40,3 +40,31 @@ export function encodeToken(token) {
         });
     });
 }
+
+/**
+ * Decode the given encoded authentication token from a String back into a Token object
+ * The encoded token should have been encoded using the above encodeToken function
+ * @param {String} encoded The encoded token
+ * @return {Promise} a promise for the decoded token
+ */
+export function decodeToken(encoded) {
+    return new Promise(function(resolve, reject) {
+        jwt.verify(encoded, config.get('authentication.signingKey'), {
+            algorithms: ['HS256'],
+            audience: ISSUER,
+            issuer: ISSUER
+        }, function(err, decoded) {
+            if (err) {
+                reject(err);
+            } else {
+                const token = new Token({
+                    startTime: moment.unix(decoded.nbf),
+                    expiryTime: moment.unix(decoded.exp),
+                    tokenId: decoded.jti,
+                    userId: decoded.sub
+                });
+                resolve(token);
+            }
+        });
+    });
+}

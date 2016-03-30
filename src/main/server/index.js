@@ -79,7 +79,7 @@ export function startServer(options = {}) {
             }
         }, {
             plugin: {
-                register: './routes/routesPlugin',
+                register: 'hapi-glob-routes',
                 options: {
                     files: `${__dirname}/routes/**/*.route.js`
                 }
